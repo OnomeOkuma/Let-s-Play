@@ -1,12 +1,13 @@
 package com.letsplay.ui;
 
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.annotation.VaadinSessionScope;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 
 @SpringComponent
-@VaadinSessionScope
+@UIScope
 public class UserRack extends CustomComponent {
 	
 	

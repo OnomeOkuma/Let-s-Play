@@ -1,6 +1,7 @@
 package com.letsplay.ui;
 
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
@@ -9,6 +10,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 
 @SpringComponent
+@UIScope
 public class Scoreboard extends CustomComponent {
 	
 	/**

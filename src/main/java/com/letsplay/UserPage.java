@@ -33,6 +33,7 @@ public class UserPage extends UI {
 	@Override
 	protected void init(VaadinRequest request) {
 		this.setContent(gameArea);
+		this.setId("game");
 	}
 	
 	@WebListener

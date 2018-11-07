@@ -1,19 +1,20 @@
 package com.letsplay.ui;
 
-import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.letsplay.logic.Gamestate;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.VaadinSessionScope;
+import com.vaadin.spring.annotation.UIScope;
+
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.VerticalLayout;
 
 @SpringComponent
-@VaadinSessionScope
+@UIScope
 public class GameArea extends CustomComponent{
 	
 	
@@ -27,6 +28,9 @@ public class GameArea extends CustomComponent{
 	
 
 	private UserRack rack;
+	
+	@Value("${application.users}")
+	String destination;
 	
 	@Autowired
 	public GameArea(Gamestate gamestate,UserRack rack, Board board,GameButtons gamebuttons) {
@@ -70,10 +74,9 @@ public class GameArea extends CustomComponent{
 		this.board.placeBoardTile(boardTile, column, row);
 
 	}
+	
+	public void updateUsersList(String username) {
 
-	public void updateUsersList(ArrayList<String> users) {
-
-		this.players.setItems(users);
-
+		this.players.setItems(username);
 	}
 }
