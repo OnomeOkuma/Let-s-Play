@@ -6,6 +6,7 @@ import org.vaadin.spring.security.shared.VaadinSharedSecurity;
 import com.letsplay.logic.Gamestate;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
+import com.vaadin.spring.annotation.VaadinSessionScope;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.UI;

@@ -1,10 +1,12 @@
 package com.letsplay.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.AuthenticationException;
 import org.vaadin.spring.security.shared.VaadinSharedSecurity;
 
 import com.letsplay.logic.Gamestate;
+import com.letsplay.serviceImpl.LoginEvent;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.VaadinSessionScope;
@@ -31,7 +33,10 @@ public class LoginWindow extends Window{
 
 	@Autowired
 	VaadinSharedSecurity vaadinSecurity;
-	 
+	
+	@Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+	
 	public LoginWindow() {
 	
 		FormLayout form = new FormLayout();
@@ -52,6 +57,8 @@ public class LoginWindow extends Window{
 			try {
 				
 				vaadinSecurity.login(username.getValue(), password.getValue());
+				LoginEvent loginEvent = new LoginEvent(this, username.getValue());
+				applicationEventPublisher.publishEvent(loginEvent);
 				
 			} catch (AuthenticationException e) {
 				Notification.show("Incorrect Username or Password",Type.ERROR_MESSAGE);
