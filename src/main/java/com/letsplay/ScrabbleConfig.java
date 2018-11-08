@@ -1,12 +1,8 @@
 package com.letsplay;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.quinto.dawg.CompressedDAWGSet;
 import org.quinto.dawg.ModifiableDAWGSet;
@@ -19,6 +15,7 @@ import org.springframework.jms.annotation.EnableJms;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.vaadin.server.WrappedHttpSession;
 import com.vaadin.spring.annotation.EnableVaadin;
 
 @Configuration
@@ -27,8 +24,6 @@ import com.vaadin.spring.annotation.EnableVaadin;
 @EnableJpaRepositories
 @EnableJms
 public class ScrabbleConfig {
-
-	private static final Map<String, HttpSession> sessions = new HashMap<>();
 	 
 	@Bean
 	@Scope("singleton")
@@ -47,26 +42,17 @@ public class ScrabbleConfig {
 	
 	@Bean
 	public PasswordEncoder getEncoder() {
+		
 		BCryptPasswordEncoder encrypt = new BCryptPasswordEncoder(9);
 		
-		System.out.println(encrypt.encode("admin"));
+		return encrypt;
 		
-		return new BCryptPasswordEncoder(9);
 	}
 	
 	@Bean
-    public HttpSessionListener httpSessionListener() {
-        return new HttpSessionListener() {
-            @Override
-            public void sessionCreated(HttpSessionEvent hse) {
-                sessions.put(hse.getSession().getId(), hse.getSession());
-            }
-
-            @Override
-            public void sessionDestroyed(HttpSessionEvent hse) {
-                sessions.remove(hse.getSession().getId());
-            }
-        };
-    }
+	@Scope("singleton")
+	public Collection<WrappedHttpSession> getSessionList(){
+		return new ConcurrentLinkedQueue<WrappedHttpSession>();
+	}
 }
 

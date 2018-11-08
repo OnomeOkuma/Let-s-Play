@@ -1,10 +1,8 @@
 package com.letsplay;
 
-import javax.servlet.annotation.WebListener;
 import javax.servlet.annotation.WebServlet;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.ContextLoaderListener;
 
 import com.letsplay.ui.HomeLayout;
 import com.vaadin.annotations.Theme;
@@ -27,12 +25,7 @@ public class Login extends UI{
 
 	@Autowired
     HomeLayout homeLayout;
-    
-	
-    @WebListener
-    public static class MyContextLoaderListener extends ContextLoaderListener {
-    }
-    
+        
     
 	@Override
 	protected void init(VaadinRequest request) {

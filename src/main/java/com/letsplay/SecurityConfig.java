@@ -69,7 +69,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
             .permitAll().antMatchers("/vaadinServlet/HEARTBEAT/**").permitAll().anyRequest().authenticated();
         http.httpBasic().disable();
         http.formLogin().disable();
-       
+        http.sessionManagement().maximumSessions(1);
         // Remember to add the VaadinSessionClosingLogoutHandler
         http.logout().addLogoutHandler(new VaadinSessionClosingLogoutHandler()).logoutUrl("/logout")
             .logoutSuccessUrl("/login").permitAll();

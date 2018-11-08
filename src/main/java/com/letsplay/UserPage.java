@@ -1,7 +1,10 @@
 package com.letsplay;
 
+import java.util.Collection;
+
 import javax.servlet.annotation.WebListener;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.ContextLoaderListener;
@@ -11,6 +14,7 @@ import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.WrappedHttpSession;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.annotation.VaadinSessionScope;
 import com.vaadin.spring.server.SpringVaadinServlet;
@@ -30,15 +34,22 @@ public class UserPage extends UI {
 	@Autowired
 	GameArea gameArea;
 	
+	@Autowired
+	Collection<WrappedHttpSession> sessions;
+	
 	@Override
 	protected void init(VaadinRequest request) {
 		this.setContent(gameArea);
 		this.setId("game");
+		WrappedHttpSession wrapper = (WrappedHttpSession) request.getWrappedSession();
+		sessions.add(wrapper);
 	}
 	
 	@WebListener
     public static class MyContextLoaderListener extends ContextLoaderListener {
+		
     }
+	
 	
 	@WebServlet(urlPatterns = "/*", name = "UserPageUIServlet", asyncSupported = true)
 	@VaadinServletConfiguration(ui = UserPage.class, productionMode = false)
