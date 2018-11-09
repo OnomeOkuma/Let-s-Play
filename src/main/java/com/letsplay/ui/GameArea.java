@@ -1,6 +1,8 @@
 package com.letsplay.ui;
 
 
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -75,8 +77,9 @@ public class GameArea extends CustomComponent{
 
 	}
 	
-	public void updateUsersList(String username) {
+	public void updateUsersList(Set<String> username) {
 
 		this.players.setItems(username);
+		
 	}
 }

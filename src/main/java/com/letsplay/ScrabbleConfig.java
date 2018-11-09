@@ -24,7 +24,7 @@ import com.vaadin.spring.annotation.EnableVaadin;
 @EnableJpaRepositories
 @EnableJms
 public class ScrabbleConfig {
-	 
+	
 	@Bean
 	@Scope("singleton")
 	public CompressedDAWGSet getDawg() {
@@ -54,5 +54,6 @@ public class ScrabbleConfig {
 	public Collection<WrappedHttpSession> getSessionList(){
 		return new ConcurrentLinkedQueue<WrappedHttpSession>();
 	}
+		 
 }
 

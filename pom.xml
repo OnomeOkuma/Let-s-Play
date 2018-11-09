@@ -44,6 +44,7 @@
     <artifactId>spring-boot-starter-activemq</artifactId>
 </dependency>
 		
+		
 		<dependency>
 			<groupId>org.quinto.dawg</groupId>
 			<artifactId>DAWG</artifactId>
@@ -58,16 +59,6 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-spring-boot-starter</artifactId>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/io.lettuce/lettuce-core -->
-		<dependency>
-			<groupId>io.lettuce</groupId>
-			<artifactId>lettuce-core</artifactId>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-activemq -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-activemq</artifactId>
 		</dependency>
 
 		<!-- <dependency> <groupId>org.postgresql</groupId> <artifactId>postgresql</artifactId> 
@@ -88,6 +79,11 @@
 			<artifactId>locale</artifactId>
 			<version>1.2.0</version>
 		</dependency>
+	
+	<dependency>
+    <groupId>com.vaadin</groupId>
+    <artifactId>vaadin-push</artifactId>
+</dependency>
 
 		<dependency>
 			<groupId>org.vaadin.spring.extensions</groupId>

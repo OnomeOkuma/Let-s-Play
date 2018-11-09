@@ -1,12 +1,13 @@
 package com.letsplay.ui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.AuthenticationException;
 import org.vaadin.spring.security.shared.VaadinSharedSecurity;
 
 import com.letsplay.logic.Gamestate;
-import com.letsplay.serviceImpl.LoginEvent;
+import com.letsplay.service.ActivePlayerService;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.VaadinSessionScope;
@@ -28,6 +29,8 @@ public class LoginWindow extends Window{
 	 * 
 	 */
 	private static final long serialVersionUID = 14601904453460151L;
+	private Logger logger = LoggerFactory.getLogger(LoginWindow.class);
+	
 	@Autowired
 	Gamestate gamestate;
 
@@ -35,7 +38,9 @@ public class LoginWindow extends Window{
 	VaadinSharedSecurity vaadinSecurity;
 	
 	@Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
+	ActivePlayerService activePlayerService;
+	
+
 	
 	public LoginWindow() {
 	
@@ -57,13 +62,15 @@ public class LoginWindow extends Window{
 			try {
 				
 				vaadinSecurity.login(username.getValue(), password.getValue());
-				LoginEvent loginEvent = new LoginEvent(this, username.getValue());
-				applicationEventPublisher.publishEvent(loginEvent);
+				logger.info("Login successful.............");
+		
+				activePlayerService.create(username.getValue());
+				logger.info("Active player registered.........");
 				
 			} catch (AuthenticationException e) {
 				Notification.show("Incorrect Username or Password",Type.ERROR_MESSAGE);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 			
