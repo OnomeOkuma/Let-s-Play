@@ -7,15 +7,14 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.letsplay.logic.Gamestate;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.UIScope;
-
+import com.vaadin.spring.annotation.VaadinSessionScope;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.RadioButtonGroup;
 import com.vaadin.ui.VerticalLayout;
 
 @SpringComponent
-@UIScope
+@VaadinSessionScope
 public class GameArea extends CustomComponent{
 	
 	
@@ -49,6 +48,7 @@ public class GameArea extends CustomComponent{
 		this.players.setCaption("Players Online");
 		this.players.setWidth("200px");
 		this.players.addSelectionListener(listener -> {
+			
 			
 		});
 		
