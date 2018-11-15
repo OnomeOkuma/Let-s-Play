@@ -1,16 +1,16 @@
-package com.letsplay.serviceImpl;
+package com.letsplay.events;
 
 import org.springframework.context.ApplicationEvent;
 
-public class LoginEvent extends ApplicationEvent {
-	
+public class LogoutEvent extends ApplicationEvent {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -2696674071296395587L;
+	private static final long serialVersionUID = -8893237340742969788L;
 	private String username; 
 	
-	public LoginEvent(Object source, String username) {
+	public LogoutEvent(Object source, String username) {
 		super(source);
 		this.setUsername(username);
 	}

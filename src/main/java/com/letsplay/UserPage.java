@@ -1,6 +1,6 @@
 package com.letsplay;
 
-import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.annotation.WebListener;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.context.ContextLoaderListener;
 
-import com.letsplay.serviceImpl.LoginEvent;
+import com.letsplay.events.LoginEvent;
 import com.letsplay.ui.GameArea;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Push;
@@ -39,7 +39,7 @@ public class UserPage extends UI {
 	GameArea gameArea;
 	
 	@Autowired
-	Collection<WrappedHttpSession> sessions;
+	Map<String, WrappedHttpSession> sessionList;
 	
 	@Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -47,11 +47,13 @@ public class UserPage extends UI {
 	@Override
 	protected void init(VaadinRequest request) {
 		this.setContent(gameArea);
-		this.setId("game");
 		WrappedHttpSession wrapper = (WrappedHttpSession) request.getWrappedSession();
-		sessions.add(wrapper);
-		LoginEvent loginEvent = new LoginEvent(this, request.getRemoteUser());
-		applicationEventPublisher.publishEvent(loginEvent);
+		
+		if(!sessionList.containsKey(request.getRemoteUser())) {
+			sessionList.put(request.getRemoteUser(), wrapper);
+			LoginEvent loginEvent = new LoginEvent(this, request.getRemoteUser());
+			applicationEventPublisher.publishEvent(loginEvent);
+		}
 	}
 	
 	public void updatePlayerList(Set<String> username) {

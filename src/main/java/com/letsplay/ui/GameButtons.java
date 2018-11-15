@@ -1,9 +1,17 @@
 package com.letsplay.ui;
 
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.vaadin.spring.security.shared.VaadinSharedSecurity;
 
+import com.letsplay.events.LogoutEvent;
 import com.letsplay.logic.Gamestate;
+import com.letsplay.service.ActivePlayerService;
+import com.vaadin.server.WrappedHttpSession;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
@@ -15,6 +23,7 @@ import com.vaadin.ui.VerticalLayout;
 @UIScope
 public class GameButtons extends CustomComponent {
 
+	private Logger logger = LoggerFactory.getLogger(GameButtons.class);
 
 	/**
 	 * 
@@ -24,6 +33,15 @@ public class GameButtons extends CustomComponent {
 	
 	@Autowired
 	VaadinSharedSecurity vaadinSecurity;
+	
+	@Autowired
+	Map<String, WrappedHttpSession> sessionList;
+	
+	@Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+	
+	@Autowired
+	ActivePlayerService activePlayerService;
 	
 	@Autowired
 	public GameButtons(Scoreboard scoreBoard) {
@@ -62,7 +80,15 @@ public class GameButtons extends CustomComponent {
 		Button logoutButton = new Button("Log Out");
 		logoutButton.addClickListener(listener -> {
 			
+			String userToLogout = vaadinSecurity.getAuthentication().getName();
+			sessionList.remove(userToLogout);
+			activePlayerService.deleteByName(userToLogout);
 			vaadinSecurity.logout();
+			
+			logger.info("Logout complete.............");
+			
+			LogoutEvent event = new LogoutEvent(this, userToLogout);
+			applicationEventPublisher.publishEvent(event);
 			
 		});
 

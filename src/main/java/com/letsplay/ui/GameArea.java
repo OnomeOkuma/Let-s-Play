@@ -1,6 +1,5 @@
 package com.letsplay.ui;
 
-
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,7 @@ import com.vaadin.spring.annotation.UIScope;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.RadioButtonGroup;
 import com.vaadin.ui.VerticalLayout;
 
 @SpringComponent
@@ -26,7 +25,7 @@ public class GameArea extends CustomComponent{
 	private static final long serialVersionUID = 1445297031956063093L;
 	public Board board;
 	private HorizontalLayout mainLayout;
-	private ListSelect<String> players;
+	private RadioButtonGroup<String> players;
 	
 
 	private UserRack rack;
@@ -46,7 +45,7 @@ public class GameArea extends CustomComponent{
 			this.rack.addTile(gameTile);
 		}
 		
-		this.players = new ListSelect<String>();
+		this.players = new RadioButtonGroup<String>();
 		this.players.setCaption("Players Online");
 		this.players.setWidth("200px");
 		this.players.addSelectionListener(listener -> {

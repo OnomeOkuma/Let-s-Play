@@ -2,6 +2,8 @@ package com.letsplay;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.quinto.dawg.CompressedDAWGSet;
@@ -54,6 +56,13 @@ public class ScrabbleConfig {
 	public Collection<WrappedHttpSession> getSessionList(){
 		return new ConcurrentLinkedQueue<WrappedHttpSession>();
 	}
-		 
+		
+	@Bean
+	@Scope("singleton")
+	public Map<String, WrappedHttpSession> getSessionTable(){
+		
+		return new ConcurrentHashMap<String,WrappedHttpSession>();
+	
+	}
 }
 
