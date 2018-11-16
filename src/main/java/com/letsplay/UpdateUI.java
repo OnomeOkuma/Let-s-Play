@@ -9,7 +9,9 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+import org.vaadin.dialogs.ConfirmDialog;
 
+import com.letsplay.events.PlayInviteEvent;
 import com.letsplay.repository.ActivePlayer;
 import com.letsplay.service.ActivePlayerService;
 import com.vaadin.server.VaadinSession;
@@ -94,5 +96,23 @@ public class UpdateUI {
 				});
 
 		}
+	}
+	
+	@JmsListener(destination = "invite")
+	public void sentInvite(PlayInviteEvent event) {
+		
+		WrappedHttpSession session = sessionList.get(event.getToPlayer());
+		Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
+		
+		VaadinSession vaaSession = vaadinSessions.iterator().next();
+		Collection<UI> uis = vaaSession.getUIs();
+		UserPage ui = (UserPage) uis.iterator().next();
+		
+		ConfirmDialog dialog = new ConfirmDialog();
+		
+		dialog.setMessage(event.getFromPlayer() + " wants to play");
+		
+		dialog.show(ui, listener -> {}, true);
+		
 	}
 }

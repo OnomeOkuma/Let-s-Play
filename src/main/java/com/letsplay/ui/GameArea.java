@@ -1,10 +1,14 @@
 package com.letsplay.ui;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 
+import com.letsplay.UserPage;
+import com.letsplay.events.PlayInviteEvent;
 import com.letsplay.logic.Gamestate;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.VaadinSessionScope;
@@ -28,16 +32,20 @@ public class GameArea extends CustomComponent{
 	
 
 	private UserRack rack;
+	private ApplicationEventPublisher applicationEventPublisher;
 	
 	@Value("${application.users}")
 	String destination;
 	
 	@Autowired
-	public GameArea(Gamestate gamestate,UserRack rack, Board board,GameButtons gamebuttons) {
+	public GameArea(Gamestate gamestate,UserRack rack, Board board,GameButtons gamebuttons,
+			ApplicationEventPublisher applicationEventPublisher) {
 		this.setData(gamestate);
 		
 		this.board = board;
 		this.rack = rack;
+		this.applicationEventPublisher = applicationEventPublisher;
+		
 		for (int temp = 0; temp < 7; temp++){
 			Gamestate tempstate = (Gamestate)this.getData();
 			GameTile gameTile = tempstate.tileBag.getTile();
@@ -49,7 +57,14 @@ public class GameArea extends CustomComponent{
 		this.players.setWidth("200px");
 		this.players.addSelectionListener(listener -> {
 			
-			
+			Optional<String> toPlayer = this.players.getSelectedItem();
+			if(toPlayer.isPresent()) {
+				PlayInviteEvent event = new PlayInviteEvent("play");
+				UserPage ui = (UserPage)this.getUI();
+				event.setFromPlayer(ui.getCurrentUser());
+				event.setToPlayer(toPlayer.get());
+				this.applicationEventPublisher.publishEvent(event);
+			}
 		});
 		
 		GameButtons buttonArea = gamebuttons;

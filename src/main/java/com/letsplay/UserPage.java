@@ -44,12 +44,15 @@ public class UserPage extends UI {
 	@Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 	
+	private String currentUser;
+	
 	@Override
 	protected void init(VaadinRequest request) {
 		this.setContent(gameArea);
 		WrappedHttpSession wrapper = (WrappedHttpSession) request.getWrappedSession();
 		
 		if(!sessionList.containsKey(request.getRemoteUser())) {
+			this.setCurrentUser(request.getRemoteUser());
 			sessionList.put(request.getRemoteUser(), wrapper);
 			LoginEvent loginEvent = new LoginEvent(this, request.getRemoteUser());
 			applicationEventPublisher.publishEvent(loginEvent);
@@ -60,6 +63,14 @@ public class UserPage extends UI {
 		this.gameArea.updateUsersList(username);
 	}
 	
+	public String getCurrentUser() {
+		return currentUser;
+	}
+
+	public void setCurrentUser(String currentUser) {
+		this.currentUser = currentUser;
+	}
+
 	@WebListener
     public static class MyContextLoaderListener extends ContextLoaderListener {
 		
