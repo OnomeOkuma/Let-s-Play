@@ -64,6 +64,7 @@ public class GameArea extends CustomComponent{
 				event.setFromPlayer(ui.getCurrentUser());
 				event.setToPlayer(toPlayer.get());
 				this.applicationEventPublisher.publishEvent(event);
+				this.players.clear();
 			}
 		});
 		

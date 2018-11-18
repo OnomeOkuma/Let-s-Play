@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.dialogs.DefaultConfirmDialogFactory;
 
 import com.letsplay.events.PlayInviteEvent;
 import com.letsplay.repository.ActivePlayer;
@@ -107,12 +108,19 @@ public class UpdateUI {
 		VaadinSession vaaSession = vaadinSessions.iterator().next();
 		Collection<UI> uis = vaaSession.getUIs();
 		UserPage ui = (UserPage) uis.iterator().next();
-		
-		ConfirmDialog dialog = new ConfirmDialog();
-		
-		dialog.setMessage(event.getFromPlayer() + " wants to play");
-		
-		dialog.show(ui, listener -> {}, true);
+		DefaultConfirmDialogFactory df = new DefaultConfirmDialogFactory();
+		ConfirmDialog cd = df.create("Play Invite", event.getFromPlayer() + " wants to play.", 
+								"Okay",null, "Not Okay");
+
+		ui.access(new Runnable() {
+
+			@Override
+			public void run() {
+				cd.show(ui, listener -> {}, true);
+				ui.push();
+			}
+
+		});
 		
 	}
 }
