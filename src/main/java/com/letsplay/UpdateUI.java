@@ -7,28 +7,42 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.dialogs.DefaultConfirmDialogFactory;
 
+import com.letsplay.events.PlayAcceptEvent;
 import com.letsplay.events.PlayInviteEvent;
 import com.letsplay.repository.ActivePlayer;
+import com.letsplay.repository.GameSession;
 import com.letsplay.service.ActivePlayerService;
+import com.letsplay.service.GameSessionService;
+import com.letsplay.utils.ActivePlayerNotFoundException;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedHttpSession;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.Notification.Type;
 
 @Component
 public class UpdateUI {
 
 	@Autowired
-	Map<String, WrappedHttpSession> sessionList;
+	private Map<String, WrappedHttpSession> sessionList;
 
 	@Autowired
-	ActivePlayerService activePlayers;
+	private ActivePlayerService activePlayers;
 
-	@JmsListener(destination = "users")
+	@Autowired
+	private GameSessionService gameSessionService;
+	
+	@Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+	
+	@JmsListener(destination = "${application.users}")
 	public void updatePlayerList(String user) {
 
 		Set<String> players = new HashSet<>();
@@ -65,7 +79,7 @@ public class UpdateUI {
 	}
 	
 	
-	@JmsListener(destination = "logout")
+	@JmsListener(destination = "${application.logout}")
 	public void removePlayerFromList(String user) {
 		Set<String> players = new HashSet<>();
 		List<ActivePlayer> active = activePlayers.findAll();
@@ -99,7 +113,7 @@ public class UpdateUI {
 		}
 	}
 	
-	@JmsListener(destination = "invite")
+	@JmsListener(destination = "${application.invite}")
 	public void sentInvite(PlayInviteEvent event) {
 		
 		WrappedHttpSession session = sessionList.get(event.getToPlayer());
@@ -111,13 +125,76 @@ public class UpdateUI {
 		DefaultConfirmDialogFactory df = new DefaultConfirmDialogFactory();
 		ConfirmDialog cd = df.create("Play Invite", event.getFromPlayer() + " wants to play.", 
 								"Okay",null, "Not Okay");
+		
+		Button okayButton = cd.getOkButton();
+		
+		okayButton.addClickListener(listener -> {
+			
+			
+			try {
+				
+				ActivePlayer player1 = activePlayers.findByName(event.getFromPlayer());
+				ActivePlayer player2 = activePlayers.findByName(event.getToPlayer());
+				GameSession gameSession = new GameSession();
+				gameSession.setPlayer1(player1);
+				gameSession.setPlayer2(player2);
+				gameSession.setName(player1.getName() + " vs " + player2.getName());
+				gameSessionService.saveSession(gameSession);
+				
+				// Add UI GameArea setup logic to synchronize state between both players.
+				ui.access(new Runnable() {
 
+					@Override
+					public void run() {
+						Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
+						ui.push();
+					}
+
+				});
+				
+				PlayAcceptEvent acceptEvent = new PlayAcceptEvent("Accept");
+				acceptEvent.setNotifyPlayer(event.getFromPlayer());
+				applicationEventPublisher.publishEvent(acceptEvent);
+				
+			} catch (ActivePlayerNotFoundException e) {
+				
+				e.printStackTrace();
+				
+			}
+			
+		});	
+		
 		ui.access(new Runnable() {
 
 			@Override
 			public void run() {
 				cd.show(ui, listener -> {}, true);
 				ui.push();
+			}
+
+		});
+		
+	}
+	
+	@JmsListener(destination = "${application.accept}")
+	public void inviteAccepted(PlayAcceptEvent event) {
+		
+		WrappedHttpSession session = sessionList.get(event.getNotifyPlayer());
+		Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
+		
+		VaadinSession vaaSession = vaadinSessions.iterator().next();
+		Collection<UI> uis = vaaSession.getUIs();
+		UserPage ui = (UserPage) uis.iterator().next();
+		
+		// Add UI GameArea setup logic to synchronize state between both players.
+		ui.access(new Runnable() {
+
+			@Override
+			public void run() {
+				
+				Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
+				ui.push();
+				
 			}
 
 		});

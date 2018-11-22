@@ -2,9 +2,12 @@ package com.letsplay.serviceImpl;
 
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.letsplay.repository.ActivePlayer;
 import com.letsplay.repository.GameSession;
@@ -12,6 +15,8 @@ import com.letsplay.repository.GameSessionRepository;
 import com.letsplay.service.GameSessionService;
 import com.letsplay.utils.GameSessionNotFoundException;
 
+@Service
+@Transactional
 public class GameSessionServiceImpl implements GameSessionService {
 	
 	private Logger logger = LoggerFactory.getLogger(GameSessionServiceImpl.class);
