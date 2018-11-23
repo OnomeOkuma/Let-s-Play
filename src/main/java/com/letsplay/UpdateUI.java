@@ -15,6 +15,9 @@ import org.vaadin.dialogs.DefaultConfirmDialogFactory;
 
 import com.letsplay.events.PlayAcceptEvent;
 import com.letsplay.events.PlayInviteEvent;
+import com.letsplay.logic.Boardstate;
+import com.letsplay.logic.PlayChecker;
+import com.letsplay.logic.Tilebag;
 import com.letsplay.repository.ActivePlayer;
 import com.letsplay.repository.GameSession;
 import com.letsplay.service.ActivePlayerService;
@@ -115,89 +118,103 @@ public class UpdateUI {
 	
 	@JmsListener(destination = "${application.invite}")
 	public void sentInvite(PlayInviteEvent event) {
-		
-		WrappedHttpSession session = sessionList.get(event.getToPlayer());
-		Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
-		
-		VaadinSession vaaSession = vaadinSessions.iterator().next();
-		Collection<UI> uis = vaaSession.getUIs();
-		UserPage ui = (UserPage) uis.iterator().next();
-		DefaultConfirmDialogFactory df = new DefaultConfirmDialogFactory();
-		ConfirmDialog cd = df.create("Play Invite", event.getFromPlayer() + " wants to play.", 
-								"Okay",null, "Not Okay");
-		
-		Button okayButton = cd.getOkButton();
-		
-		okayButton.addClickListener(listener -> {
-			
-			
-			try {
-				
-				ActivePlayer player1 = activePlayers.findByName(event.getFromPlayer());
-				ActivePlayer player2 = activePlayers.findByName(event.getToPlayer());
-				GameSession gameSession = new GameSession();
-				gameSession.setPlayer1(player1);
-				gameSession.setPlayer2(player2);
-				gameSession.setName(player1.getName() + " vs " + player2.getName());
-				gameSessionService.saveSession(gameSession);
-				
-				// Add UI GameArea setup logic to synchronize state between both players.
-				ui.access(new Runnable() {
 
-					@Override
-					public void run() {
-						Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
-						ui.push();
-					}
+		if (sessionList.containsKey(event.getToPlayer())) {
+			WrappedHttpSession session = sessionList.get(event.getToPlayer());
+			Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
 
-				});
-				
-				PlayAcceptEvent acceptEvent = new PlayAcceptEvent("Accept");
-				acceptEvent.setNotifyPlayer(event.getFromPlayer());
-				applicationEventPublisher.publishEvent(acceptEvent);
-				
-			} catch (ActivePlayerNotFoundException e) {
-				
-				e.printStackTrace();
-				
-			}
-			
-		});	
-		
-		ui.access(new Runnable() {
+			VaadinSession vaaSession = vaadinSessions.iterator().next();
+			Collection<UI> uis = vaaSession.getUIs();
+			UserPage ui = (UserPage) uis.iterator().next();
+			DefaultConfirmDialogFactory df = new DefaultConfirmDialogFactory();
+			ConfirmDialog cd = df.create("Play Invite", event.getFromPlayer() + " wants to play.", "Okay", null,
+					"Not Okay");
 
-			@Override
-			public void run() {
-				cd.show(ui, listener -> {}, true);
-				ui.push();
-			}
+			Button okayButton = cd.getOkButton();
 
-		});
-		
+			okayButton.addClickListener(listener -> {
+
+				try {
+
+					ActivePlayer player1 = activePlayers.findByName(event.getFromPlayer());
+					ActivePlayer player2 = activePlayers.findByName(event.getToPlayer());
+					GameSession gameSession = new GameSession();
+					PlayChecker checker = new PlayChecker();
+					Boardstate boardState = new Boardstate();
+					Tilebag tileBag = new Tilebag();
+					
+					
+					gameSession.setPlayer1(player1);
+					gameSession.setPlayer2(player2);
+					gameSession.setName(player1.getName() + " vs " + player2.getName());
+					gameSession.setBoardState(boardState);
+					gameSession.setPlayChecker(checker);
+					gameSession.setTileBag(tileBag);
+					
+					gameSessionService.saveSession(gameSession);
+					ui.setGameSessionName(gameSession.getName());
+					
+					// Add UI GameArea setup logic to synchronize state between both players.
+					ui.access(new Runnable() {
+
+						@Override
+						public void run() {
+							Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
+							ui.push();
+						}
+
+					});
+
+					PlayAcceptEvent acceptEvent = new PlayAcceptEvent("Accept");
+					acceptEvent.setNotifyPlayer(event.getFromPlayer());
+					acceptEvent.setGameSessionName(gameSession.getName());
+					
+					applicationEventPublisher.publishEvent(acceptEvent);
+
+				} catch (ActivePlayerNotFoundException e) {
+
+					e.printStackTrace();
+
+				}
+
+			});
+
+			ui.access(new Runnable() {
+
+				@Override
+				public void run() {
+					cd.show(ui, listener -> {}, true);
+					ui.push();
+				}
+
+			});
+		}
 	}
 	
 	@JmsListener(destination = "${application.accept}")
 	public void inviteAccepted(PlayAcceptEvent event) {
-		
-		WrappedHttpSession session = sessionList.get(event.getNotifyPlayer());
-		Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
-		
-		VaadinSession vaaSession = vaadinSessions.iterator().next();
-		Collection<UI> uis = vaaSession.getUIs();
-		UserPage ui = (UserPage) uis.iterator().next();
-		
-		// Add UI GameArea setup logic to synchronize state between both players.
-		ui.access(new Runnable() {
 
-			@Override
-			public void run() {
-				
-				Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
-				ui.push();
-				
-			}
+		if (sessionList.containsKey(event.getNotifyPlayer())) {
+			WrappedHttpSession session = sessionList.get(event.getNotifyPlayer());
+			Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
 
-		});
-		
+			VaadinSession vaaSession = vaadinSessions.iterator().next();
+			Collection<UI> uis = vaaSession.getUIs();
+			UserPage ui = (UserPage) uis.iterator().next();
+			ui.setGameSessionName(event.getGameSessionName());
+			
+			// Add UI GameArea setup logic to synchronize state between both players.
+			ui.access(new Runnable() {
+
+				@Override
+				public void run() {
+
+					Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
+					ui.push();
+
+				}
+
+			});
+		}
 	}
 }

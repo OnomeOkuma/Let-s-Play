@@ -2,15 +2,19 @@ package com.letsplay.ui;
 
 import java.util.Map;
 
+import org.quinto.dawg.CompressedDAWGSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.vaadin.spring.security.shared.VaadinSharedSecurity;
 
+import com.letsplay.UserPage;
 import com.letsplay.events.LogoutEvent;
-import com.letsplay.logic.Gamestate;
+import com.letsplay.repository.GameSession;
 import com.letsplay.service.ActivePlayerService;
+import com.letsplay.service.GameSessionService;
+import com.letsplay.utils.GameSessionNotFoundException;
 import com.vaadin.server.WrappedHttpSession;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
@@ -44,6 +48,12 @@ public class GameButtons extends CustomComponent {
 	ActivePlayerService activePlayerService;
 	
 	@Autowired
+	CompressedDAWGSet wordChecker;
+	
+	@Autowired
+	GameSessionService gameSessionService;
+	
+	@Autowired
 	public GameButtons(Scoreboard scoreBoard) {
 
 		VerticalLayout layout = new VerticalLayout();
@@ -51,15 +61,23 @@ public class GameButtons extends CustomComponent {
 		Button playButton = new Button("Play");
 		playButton.setWidth("160px");
 		playButton.addClickListener(click -> {
+			
+			UserPage userPage = (UserPage) UI.getCurrent();
+			try {
+				
+				GameSession gameSession = gameSessionService.findBySessionName(userPage.getGameSessionName());
+				if (gameSession.getPlayChecker().check(wordChecker, gameSession.getBoardState())) {
+					scoreBoard.setScore(gameSession.getPlayChecker().calculatePlay(gameSession.getBoardState()));
+					gameSession.getPlayChecker().finalizePlay(gameSession.getBoardState(), gameSession.getTileBag());
+				} else {
+					gameSession.getPlayChecker().undoPlay();
+				}
+				
+				gameSessionService.saveSession(gameSession);
+			} catch (GameSessionNotFoundException e) {
 
-			GameArea gameAreaTemp = (GameArea) UI.getCurrent().getContent();
-			Gamestate state = (Gamestate) gameAreaTemp.getData();
-			if (state.playChecker.check()) {
-				scoreBoard.setScore(state.playChecker.calculatePlay());
-				state.playChecker.finalizePlay();
-			} else {
-				state.playChecker.undoPlay();
 			}
+			
 
 		});
 

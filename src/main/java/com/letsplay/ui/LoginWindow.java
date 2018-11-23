@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.vaadin.spring.security.shared.VaadinSharedSecurity;
 
-import com.letsplay.logic.Gamestate;
 import com.letsplay.service.ActivePlayerService;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -30,9 +29,6 @@ public class LoginWindow extends Window{
 	 */
 	private static final long serialVersionUID = 14601904453460151L;
 	private Logger logger = LoggerFactory.getLogger(LoginWindow.class);
-	
-	@Autowired
-	Gamestate gamestate;
 
 	@Autowired
 	VaadinSharedSecurity vaadinSecurity;

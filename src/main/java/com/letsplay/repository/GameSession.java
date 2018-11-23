@@ -2,12 +2,17 @@ package com.letsplay.repository;
 
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+
+import com.letsplay.logic.Boardstate;
+import com.letsplay.logic.PlayChecker;
+import com.letsplay.logic.Tilebag;
 
 @Entity
 public class GameSession {
@@ -26,6 +31,15 @@ public class GameSession {
 	private List<ActivePlayer> spectators;
 	
 	private String name;
+	
+	@Column(length=20000)
+	private Boardstate boardState;
+	
+	@Column(length=20000)
+	private PlayChecker playChecker;
+	
+	@Column(length=20000)
+	private Tilebag tileBag;
 	
 	public ActivePlayer getPlayer1() {
 		return player1;
@@ -57,6 +71,30 @@ public class GameSession {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Boardstate getBoardState() {
+		return boardState;
+	}
+
+	public void setBoardState(Boardstate boardState) {
+		this.boardState = boardState;
+	}
+
+	public PlayChecker getPlayChecker() {
+		return playChecker;
+	}
+
+	public void setPlayChecker(PlayChecker playChecker) {
+		this.playChecker = playChecker;
+	}
+
+	public Tilebag getTileBag() {
+		return tileBag;
+	}
+
+	public void setTileBag(Tilebag tileBag) {
+		this.tileBag = tileBag;
 	}
 	
 }

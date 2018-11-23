@@ -5,11 +5,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.VaadinSessionScope;
-
-@SpringComponent
-@VaadinSessionScope
 public class Boardstate implements Serializable{
 	
 	/**

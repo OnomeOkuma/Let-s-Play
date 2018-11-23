@@ -9,6 +9,7 @@ public class PlayAcceptEvent extends ApplicationEvent {
 	 */
 	private static final long serialVersionUID = 4292799347118994583L;
 	private String notifyPlayer;
+	private String gameSessionName;
 	
 	public PlayAcceptEvent(Object source) {
 		super(source);
@@ -20,6 +21,14 @@ public class PlayAcceptEvent extends ApplicationEvent {
 
 	public void setNotifyPlayer(String notifyPlayer) {
 		this.notifyPlayer = notifyPlayer;
+	}
+
+	public String getGameSessionName() {
+		return gameSessionName;
+	}
+
+	public void setGameSessionName(String gameSessionName) {
+		this.gameSessionName = gameSessionName;
 	}
 	
 }

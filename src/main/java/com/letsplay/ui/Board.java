@@ -1,5 +1,7 @@
 package com.letsplay.ui;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.CustomComponent;
@@ -15,7 +17,10 @@ public class Board extends CustomComponent {
 	 */
 	private static final long serialVersionUID = 8029716554160486282L;
 	GridLayout layout;
-	public Board(){
+	
+	
+	@Autowired
+	public Board(BoardTileBuilder boardTileBuilder){
 		this.layout = new GridLayout(15,15);
 		this.layout.setMargin(false);
 		this.layout.setSpacing(false);
@@ -27,123 +32,123 @@ public class Board extends CustomComponent {
 				
 				// Creates row 0 of the board.
 				case 0:	switch (columnindex){
-								case 0: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 3: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 7: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 11: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 14: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;					
+								case 0: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 3: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 7: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 11: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 14: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;					
 								} break;
 								
 				case 1: switch (columnindex){
-								case 1: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 5:	this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 9: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 13: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;	
+								case 1: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 5:	this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 9: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 13: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;	
 								} break;
 								
 				case 2: switch (columnindex){
-								case 2: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 6: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 8: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 12: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
+								case 2: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 6: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 8: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 12: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
 								} break;
 				
 				case 3: switch (columnindex){
-								case 0: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 3: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 7: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 11: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 14: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;				
+								case 0: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 3: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 7: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 11: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 14: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;				
 								} break;
 								
 				case 4: switch (columnindex){
-								case 4: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 10: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
+								case 4: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 10: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
 								} break;
 								
 				case 5: switch (columnindex){
-								case 1: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 5: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 9: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 13: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
+								case 1: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 5: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 9: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 13: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
 								} break;
 								
 				case 6: switch (columnindex){
-								case 2: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 6: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 8: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 12: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
+								case 2: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 6: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 8: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 12: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
 								} break;
 								
 				case 7: switch (columnindex){
-								case 0: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 3: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 7: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.CENTRE_BOARD).build(), columnindex, rowindex);break;
-								case 11:this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 14: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;	
+								case 0: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 3: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 7: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.CENTRE_BOARD).build(), columnindex, rowindex);break;
+								case 11:this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 14: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;	
 								} break;
 								
 				case 8: switch (columnindex){
-								case 2: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 6: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 8: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 12: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
+								case 2: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 6: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 8: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 12: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
 								} break;
 				
 				case 9: switch (columnindex){
-								case 1: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 5: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 9: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 13: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
+								case 1: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 5: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 9: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 13: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
 								} break;
 				case 10: switch (columnindex){
-								case 4: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 10: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
+								case 4: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 10: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
 								} break;
 				
 				case 11: switch (columnindex){
-								case 0: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 3: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 7: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 11: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 14: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;				
+								case 0: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 3: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 7: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 11: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 14: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;				
 								} break;
 								
 				case 12: switch (columnindex){
-								case 2: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 6: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 8: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 12: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
+								case 2: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 6: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 8: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 12: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;
 								} break;
 				
 				case 13: switch (columnindex){
-								case 1: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 5:	this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 9: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 13: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;	
+								case 1: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 5:	this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 9: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 13: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;	
 								} break;
 								
 				case 14:	switch (columnindex){
-								case 0: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 3: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 7: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								case 11: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
-								case 14: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
-								default: this.layout.addComponent(BoardTileBuilder.get().setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;					
+								case 0: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 3: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 7: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								case 11: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.DOUBLE_LETTER_SCORE).build(), columnindex, rowindex);break;
+								case 14: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.TRIPLE_WORD_SCORE).build(), columnindex, rowindex);break;
+								default: this.layout.addComponent(boardTileBuilder.setImageUrl(BoardTile.BLANK_BOARD).build(), columnindex, rowindex); break;					
 								} break;
 				}
 			}
