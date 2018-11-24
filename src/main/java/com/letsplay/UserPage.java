@@ -36,15 +36,17 @@ public class UserPage extends UI {
 	private static final long serialVersionUID = 1258878106012788721L;
 	
 	@Autowired
-	GameArea gameArea;
+	private GameArea gameArea;
 	
 	@Autowired
-	Map<String, WrappedHttpSession> sessionList;
+	private Map<String, WrappedHttpSession> sessionList;
 	
 	@Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 	
 	private String currentUser;
+	
+	private String gameSessionName;
 	
 	@Override
 	protected void init(VaadinRequest request) {
@@ -52,7 +54,10 @@ public class UserPage extends UI {
 		WrappedHttpSession wrapper = (WrappedHttpSession) request.getWrappedSession();
 		
 		if(!sessionList.containsKey(request.getRemoteUser())) {
+			
 			this.setCurrentUser(request.getRemoteUser());
+			this.setGameSessionName("");
+			
 			sessionList.put(request.getRemoteUser(), wrapper);
 			LoginEvent loginEvent = new LoginEvent(this, request.getRemoteUser());
 			applicationEventPublisher.publishEvent(loginEvent);
@@ -69,6 +74,14 @@ public class UserPage extends UI {
 
 	public void setCurrentUser(String currentUser) {
 		this.currentUser = currentUser;
+	}
+
+	public String getGameSessionName() {
+		return gameSessionName;
+	}
+
+	public void setGameSessionName(String gameSessionName) {
+		this.gameSessionName = gameSessionName;
 	}
 
 	@WebListener

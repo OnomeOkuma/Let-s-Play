@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import com.letsplay.UserPage;
 import com.letsplay.events.PlayInviteEvent;
 import com.letsplay.logic.Gamestate;
+import com.letsplay.logic.Tilebag;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.VaadinSessionScope;
 import com.vaadin.ui.CustomComponent;
@@ -38,17 +39,17 @@ public class GameArea extends CustomComponent{
 	String destination;
 	
 	@Autowired
-	public GameArea(Gamestate gamestate,UserRack rack, Board board,GameButtons gamebuttons,
+	public GameArea(UserRack rack, Board board,GameButtons gamebuttons,
 			ApplicationEventPublisher applicationEventPublisher) {
-		this.setData(gamestate);
 		
 		this.board = board;
 		this.rack = rack;
 		this.applicationEventPublisher = applicationEventPublisher;
 		
+		Tilebag tileBag = new Tilebag();
+		
 		for (int temp = 0; temp < 7; temp++){
-			Gamestate tempstate = (Gamestate)this.getData();
-			GameTile gameTile = tempstate.tileBag.getTile();
+			GameTile gameTile = tileBag.getTile();
 			this.rack.addTile(gameTile);
 		}
 		

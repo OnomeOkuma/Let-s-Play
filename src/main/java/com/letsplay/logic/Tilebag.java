@@ -10,11 +10,9 @@ import java.util.Random;
 import com.letsplay.ui.GameTile;
 import com.letsplay.ui.GameTileBuilder;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.VaadinSessionScope;
 import com.vaadin.ui.AbstractComponent;
 
 @SpringComponent
-@VaadinSessionScope
 public class Tilebag implements Serializable{
 
 	/**

@@ -1,26 +1,39 @@
 package com.letsplay.ui;
 
+import java.io.Serializable;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.letsplay.UserPage;
 import com.letsplay.logic.BoardPosition;
-import com.letsplay.logic.Gamestate;
 import com.letsplay.logic.Tilestate;
+import com.letsplay.repository.GameSession;
+import com.letsplay.service.GameSessionService;
+import com.letsplay.utils.GameSessionNotFoundException;
+import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.dnd.DropTargetExtension;
 
-public class BoardTileBuilder {
-private String imageUrl; 
+@SpringComponent
+public class BoardTileBuilder implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 881855367056193574L;
+
+	private String imageUrl; 
+	
+	@Autowired
+	transient GameSessionService gameSessionService;
 	
 	private BoardTileBuilder(){
 		
 	}
-	
-	public static BoardTileBuilder get(){
-		return new BoardTileBuilder();
-	}
-	
+		
 	public BoardTileBuilder setImageUrl(String imageUrl){
 		this.imageUrl = imageUrl;
 		return this;
@@ -41,29 +54,36 @@ private String imageUrl;
 					
 					// Get the location of the tile on the layout.
 					if (grid.getComponent(column, row) == tile){
-						GameArea gameAreaTemp = (GameArea) UI.getCurrent().getContent();
-						Gamestate state = (Gamestate) gameAreaTemp.getData();
-						BoardPosition position = state.boardState.getEmptyPosition(column, row);
+						UserPage userPage = (UserPage) UI.getCurrent();
 						
-						// Place the position and tile in the temporary location for play validation.
 						try {
+							GameSession gameSession = gameSessionService.findBySessionName(userPage.getGameSessionName());
+							BoardPosition position = gameSession.getBoardState().getEmptyPosition(column, row);
 							
-							state.playChecker.makePlay(position, tile);
-							grid.replaceComponent(tile, drop.getDragSourceComponent().get());
-							grid.removeComponent(tile);
+							// Place the position and tile in the temporary location for play validation.
+							try {
+								
+								gameSession.getPlayChecker().makePlay(position, tile);
+								grid.replaceComponent(tile, drop.getDragSourceComponent().get());
+								grid.removeComponent(tile);
+								
+								// Update it with the TileState.
+								position.setTileState((Tilestate) drop.getDragData().get());
+								
+								gameSessionService.saveSession(gameSession);
+								break;
+								
+							} catch (Exception e) {
+								
+								Notification.show("Invalid Play", Type.ERROR_MESSAGE);
+								e.printStackTrace();
+								break;
+								
+							}
 							
-							// Update it with the TileState.
-							position.setTileState((Tilestate) drop.getDragData().get());
+						} catch (GameSessionNotFoundException e1) {
 							
-							
-							gameAreaTemp.setData(state);
-							break;
-							
-						} catch (Exception e) {
-							
-							Notification.show("Invalid Play", Type.ERROR_MESSAGE);
-							e.printStackTrace();
-							break;
+							Notification.show("User has not entered into a Gaming Session", Type.ERROR_MESSAGE);
 							
 						}
 						
