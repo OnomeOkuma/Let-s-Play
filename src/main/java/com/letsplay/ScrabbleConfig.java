@@ -1,19 +1,20 @@
 package com.letsplay;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.quinto.dawg.CompressedDAWGSet;
 import org.quinto.dawg.ModifiableDAWGSet;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jms.annotation.EnableJms;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -26,6 +27,12 @@ import com.vaadin.spring.annotation.EnableVaadin;
 @EnableJpaRepositories
 @EnableJms
 public class ScrabbleConfig {
+	
+	@Value("${event.pool.max}")
+	int maxPool;
+	
+	@Value("${event.pool.core}")
+	int corePool;
 	
 	@Bean
 	@Scope("singleton")
@@ -46,23 +53,30 @@ public class ScrabbleConfig {
 	public PasswordEncoder getEncoder() {
 		
 		BCryptPasswordEncoder encrypt = new BCryptPasswordEncoder(9);
-		
 		return encrypt;
 		
 	}
-	
-	@Bean
-	@Scope("singleton")
-	public Collection<WrappedHttpSession> getSessionList(){
-		return new ConcurrentLinkedQueue<WrappedHttpSession>();
-	}
-		
+			
 	@Bean
 	@Scope("singleton")
 	public Map<String, WrappedHttpSession> getSessionTable(){
 		
 		return new ConcurrentHashMap<String,WrappedHttpSession>();
 	
+	}
+	
+	@Bean
+	public ApplicationEventMulticaster simpleApplicationEventMulticaster() {
+		SimpleApplicationEventMulticaster multicast = new SimpleApplicationEventMulticaster();
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setMaxPoolSize(maxPool);
+		executor.setCorePoolSize(corePool);
+		
+		multicast.setTaskExecutor(executor);
+		
+		return multicast;
+		
+		
 	}
 }
 
