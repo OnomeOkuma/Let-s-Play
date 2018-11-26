@@ -70,10 +70,11 @@ public class GameButtons extends CustomComponent {
 					scoreBoard.setScore(gameSession.getPlayChecker().calculatePlay(gameSession.getBoardState()));
 					gameSession.getPlayChecker().finalizePlay(gameSession.getBoardState(), gameSession.getTileBag());
 				} else {
-					gameSession.getPlayChecker().undoPlay();
+					gameSession.getPlayChecker().undoPlay(gameSession.getBoardState());
 				}
 				
 				gameSessionService.saveSession(gameSession);
+				
 			} catch (GameSessionNotFoundException e) {
 
 			}

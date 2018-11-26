@@ -164,4 +164,9 @@ public class Board extends CustomComponent {
 	protected void placeBoardTile(BoardTile boardTile, int column, int row) {
 		this.layout.addComponent(boardTile, column, row);
 	}
+	
+	protected void placeGameTile(GameTile gameTile, int column, int row) {
+		this.layout.removeComponent(column, row);
+		this.layout.addComponent(gameTile, column, row);
+	}
 }

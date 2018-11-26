@@ -3,8 +3,10 @@ package com.letsplay.ui;
 import java.io.Serializable;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 
 import com.letsplay.UserPage;
+import com.letsplay.events.PlayEvent;
 import com.letsplay.logic.BoardPosition;
 import com.letsplay.logic.Tilestate;
 import com.letsplay.repository.GameSession;
@@ -29,6 +31,9 @@ public class BoardTileBuilder implements Serializable{
 	
 	@Autowired
 	transient GameSessionService gameSessionService;
+	
+	@Autowired
+	transient ApplicationEventPublisher applicationEventPublisher;
 	
 	private BoardTileBuilder(){
 		
@@ -71,6 +76,15 @@ public class BoardTileBuilder implements Serializable{
 								position.setTileState((Tilestate) drop.getDragData().get());
 								
 								gameSessionService.saveSession(gameSession);
+								PlayEvent event = new PlayEvent("play made");
+								
+								if(gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
+									event.setNotifyPlayer(gameSession.getPlayer2().getName());
+								else
+									event.setNotifyPlayer(gameSession.getPlayer1().getName());
+								
+								applicationEventPublisher.publishEvent(event);
+								
 								break;
 								
 							} catch (Exception e) {

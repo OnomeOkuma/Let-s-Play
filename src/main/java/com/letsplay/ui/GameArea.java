@@ -93,6 +93,10 @@ public class GameArea extends CustomComponent{
 
 	}
 	
+	public void placeGameTile(GameTile gameTile, int column, int row) {
+		this.board.placeGameTile(gameTile, column, row);
+	}
+	
 	public void updateUsersList(Set<String> username) {
 
 		this.players.setItems(username);

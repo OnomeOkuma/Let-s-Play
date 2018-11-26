@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NavigableSet;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.quinto.dawg.CompressedDAWGSet;
@@ -213,8 +214,16 @@ public class PlayChecker implements Serializable {
 		
 		NavigableSet<BoardPosition> tiles = this.playHolder.navigableKeySet();
 		BoardPosition temp = new BoardPosition(7, 7); 
+		try {
+			
+			return tiles.contains(temp);
+			
+		}catch(ClassCastException e) {
+			
+			return false;
 		
-		return tiles.contains(temp);
+		}
+		
 	}
 	
 	
@@ -519,7 +528,7 @@ public class PlayChecker implements Serializable {
 	}
 		
 	
-	public void undoPlay() {
+	public void undoPlay(Boardstate boardState) {
 		GameArea gameArea = (GameArea)UI.getCurrent().getContent();
 		Iterator<BoardPosition> iterator = this.playHolder.keySet().iterator();
 		
@@ -533,15 +542,18 @@ public class PlayChecker implements Serializable {
 			gameArea.undoPlay(boardTile, position.getColumn(), position.getRow());
 			gameArea.addTileToRack(GameTileBuilder.get().setWeight(tileState).build());
 			
-			GameArea gameAreaTemp = (GameArea) UI.getCurrent().getContent();
-			Gamestate state = (Gamestate) gameAreaTemp.getData();
 			
-			state.boardState.setEmptyPosition(position.getColumn(), position.getRow());
+			boardState.setEmptyPosition(position.getColumn(), position.getRow());
 			
 		}
 		
 		this.playHolder.clear();
 		this.isColumn = true;
+	}
+	
+	
+	public Set<BoardPosition> getCurrentPlay(){
+		return this.playHolder.keySet();
 	}
 }
 
