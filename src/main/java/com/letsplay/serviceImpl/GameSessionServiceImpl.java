@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.letsplay.repository.ActivePlayer;
+import com.letsplay.repository.ActivePlayerRepository;
 import com.letsplay.repository.GameSession;
 import com.letsplay.repository.GameSessionRepository;
 import com.letsplay.service.GameSessionService;
@@ -24,19 +25,27 @@ public class GameSessionServiceImpl implements GameSessionService {
 	@Autowired
 	GameSessionRepository gameSessionRepo;
 	
+	@Autowired
+	ActivePlayerRepository activePlayerRepo;
+	
 	@Override
 	public GameSession findByPlayers(String player) throws GameSessionNotFoundException{
-		ActivePlayer temp = new ActivePlayer();
-		Optional<GameSession> result = gameSessionRepo.findByPlayer1(temp);
-		if (result.isPresent())
-			return result.get();
-		else {
-			result = gameSessionRepo.findByPlayer2(temp);
-			if(result.isPresent())
+		Optional<ActivePlayer> temp = activePlayerRepo.findByName(player);
+
+		if (temp.isPresent()) {
+
+			Optional<GameSession> result = gameSessionRepo.findByPlayer1(temp.get());
+			if (result.isPresent())
 				return result.get();
-			else 
-				throw new GameSessionNotFoundException("GameSession not found");
-		}
+			else {
+				result = gameSessionRepo.findByPlayer2(temp.get());
+				if (result.isPresent())
+					return result.get();
+				else
+					throw new GameSessionNotFoundException("GameSession not found");
+			}
+		} else 
+			 throw new GameSessionNotFoundException("GameSession not found");
 	}
 
 	@Override

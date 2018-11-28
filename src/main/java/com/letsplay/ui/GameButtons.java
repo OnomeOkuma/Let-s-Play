@@ -11,6 +11,7 @@ import org.vaadin.spring.security.shared.VaadinSharedSecurity;
 
 import com.letsplay.UserPage;
 import com.letsplay.events.LogoutEvent;
+import com.letsplay.events.UndoPlayEvent;
 import com.letsplay.repository.GameSession;
 import com.letsplay.service.ActivePlayerService;
 import com.letsplay.service.GameSessionService;
@@ -70,7 +71,14 @@ public class GameButtons extends CustomComponent {
 					scoreBoard.setScore(gameSession.getPlayChecker().calculatePlay(gameSession.getBoardState()));
 					gameSession.getPlayChecker().finalizePlay(gameSession.getBoardState(), gameSession.getTileBag());
 				} else {
-					gameSession.getPlayChecker().undoPlay(gameSession.getBoardState());
+					
+					UndoPlayEvent event = gameSession.getPlayChecker().undoPlay(gameSession.getBoardState());
+					if(gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
+						event.setNotifyPlayer(gameSession.getPlayer2().getName());
+					else
+						event.setNotifyPlayer(gameSession.getPlayer1().getName());
+					
+					applicationEventPublisher.publishEvent(event);
 				}
 				
 				gameSessionService.saveSession(gameSession);

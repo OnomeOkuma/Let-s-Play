@@ -3,11 +3,14 @@ package com.letsplay.logic;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 
 import org.quinto.dawg.CompressedDAWGSet;
+
+import com.letsplay.events.UndoPlayEvent;
 import com.letsplay.ui.BoardTile;
 import com.letsplay.ui.GameArea;
 import com.letsplay.ui.GameTileBuilder;
@@ -528,9 +531,12 @@ public class PlayChecker implements Serializable {
 	}
 		
 	
-	public void undoPlay(Boardstate boardState) {
+	public UndoPlayEvent undoPlay(Boardstate boardState) {
 		GameArea gameArea = (GameArea)UI.getCurrent().getContent();
 		Iterator<BoardPosition> iterator = this.playHolder.keySet().iterator();
+		List<String> boardTiles = new ArrayList<String>();
+		List<Integer> column = new ArrayList<Integer>();
+		List<Integer> row = new ArrayList<Integer>();
 		
 		while(iterator.hasNext()) {
 			
@@ -542,13 +548,22 @@ public class PlayChecker implements Serializable {
 			gameArea.undoPlay(boardTile, position.getColumn(), position.getRow());
 			gameArea.addTileToRack(GameTileBuilder.get().setWeight(tileState).build());
 			
-			
 			boardState.setEmptyPosition(position.getColumn(), position.getRow());
+			
+			boardTiles.add(boardTile.getUrl());
+			column.add(position.getColumn());
+			row.add(position.getRow());
 			
 		}
 		
 		this.playHolder.clear();
 		this.isColumn = true;
+		UndoPlayEvent event = new UndoPlayEvent("undo");
+		event.setBoardTile(boardTiles);
+		event.setColumn(column);
+		event.setRow(row);
+		return event;
+		
 	}
 	
 	

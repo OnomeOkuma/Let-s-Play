@@ -2,13 +2,11 @@ package com.letsplay.repository;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -23,16 +21,13 @@ public class GameSession {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn
+	@OneToOne
 	private ActivePlayer player1;
 	
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn
+	@OneToOne
 	private ActivePlayer player2;
 	
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn
+	@OneToMany
 	private List<ActivePlayer> spectators;
 	
 	private String name;

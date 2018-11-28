@@ -9,7 +9,6 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import com.letsplay.UserPage;
 import com.letsplay.events.PlayInviteEvent;
-import com.letsplay.logic.Gamestate;
 import com.letsplay.logic.Tilebag;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.VaadinSessionScope;

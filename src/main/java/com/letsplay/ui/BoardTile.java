@@ -17,13 +17,20 @@ public class BoardTile extends CustomComponent{
 	public static final String CENTRE_BOARD = "centre board.jpg";
 	public static final String BLANK_BOARD = "blank.jpg";
 	
+	private String url;
 	
 	BoardTile(String url){
+		this.url = url;
 		Image tile = new Image(null, new ThemeResource(url));
 		tile.setHeight("36px");
 		tile.setWidth("40px");
 		
 		setCompositionRoot(tile);
 	}
+
+	public String getUrl() {
+		return url;
+	}
+
 }
 
