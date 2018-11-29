@@ -10,12 +10,17 @@ import org.springframework.context.ApplicationEventPublisher;
 import com.letsplay.UserPage;
 import com.letsplay.events.PlayInviteEvent;
 import com.letsplay.logic.Tilebag;
+import com.letsplay.repository.GameSession;
+import com.letsplay.service.GameSessionService;
+import com.letsplay.utils.GameSessionNotFoundException;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.VaadinSessionScope;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.RadioButtonGroup;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Notification.Type;
 
 @SpringComponent
 @VaadinSessionScope
@@ -33,17 +38,20 @@ public class GameArea extends CustomComponent{
 
 	private UserRack rack;
 	private ApplicationEventPublisher applicationEventPublisher;
+	private GameSessionService gameSessionService;
 	
 	@Value("${application.users}")
 	String destination;
 	
 	@Autowired
 	public GameArea(UserRack rack, Board board,GameButtons gamebuttons,
-			ApplicationEventPublisher applicationEventPublisher) {
+			ApplicationEventPublisher applicationEventPublisher,
+			GameSessionService gameSessionService) {
 		
 		this.board = board;
 		this.rack = rack;
 		this.applicationEventPublisher = applicationEventPublisher;
+		this.gameSessionService = gameSessionService;
 		
 		Tilebag tileBag = new Tilebag();
 		
@@ -59,12 +67,25 @@ public class GameArea extends CustomComponent{
 			
 			Optional<String> toPlayer = this.players.getSelectedItem();
 			if(toPlayer.isPresent()) {
-				PlayInviteEvent event = new PlayInviteEvent("play");
-				UserPage ui = (UserPage)this.getUI();
-				event.setFromPlayer(ui.getCurrentUser());
-				event.setToPlayer(toPlayer.get());
-				this.applicationEventPublisher.publishEvent(event);
-				this.players.clear();
+				try {
+					
+					@SuppressWarnings("unused")
+					GameSession session = this.gameSessionService.findByPlayers(toPlayer.get());
+					Notification.show("User is currently in another game", Type.ERROR_MESSAGE);
+					this.players.clear();
+					
+				} catch (GameSessionNotFoundException e) {
+					
+					PlayInviteEvent event = new PlayInviteEvent("play");
+					UserPage ui = (UserPage)this.getUI();
+					event.setFromPlayer(ui.getCurrentUser());
+					event.setToPlayer(toPlayer.get());
+					this.applicationEventPublisher.publishEvent(event);
+					this.players.clear();
+				
+				}
+				
+			
 			}
 		});
 		

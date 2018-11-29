@@ -2,7 +2,6 @@ package com.letsplay.ui;
 
 import java.io.Serializable;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 
 import com.letsplay.UserPage;
@@ -29,11 +28,11 @@ public class BoardTileBuilder implements Serializable{
 
 	private String imageUrl; 
 	
-	@Autowired
-	transient GameSessionService gameSessionService;
+
+	public static transient GameSessionService gameSessionService;
 	
-	@Autowired
-	transient ApplicationEventPublisher applicationEventPublisher;
+
+	public static transient ApplicationEventPublisher applicationEventPublisher;
 	
 	private BoardTileBuilder(){
 		

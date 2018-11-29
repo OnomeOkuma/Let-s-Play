@@ -3,10 +3,15 @@ package com.letsplay;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
+
 import org.quinto.dawg.CompressedDAWGSet;
 import org.quinto.dawg.ModifiableDAWGSet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -18,6 +23,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.letsplay.service.GameSessionService;
+import com.letsplay.ui.BoardTileBuilder;
 import com.vaadin.server.WrappedHttpSession;
 import com.vaadin.spring.annotation.EnableVaadin;
 
@@ -34,6 +41,13 @@ public class ScrabbleConfig {
 	@Value("${event.pool.core}")
 	int corePool;
 	
+	@Autowired
+	GameSessionService gameSessionService;
+	
+	@Autowired
+	ApplicationEventPublisher applicationEventPublisher;
+	
+
 	@Bean
 	@Scope("singleton")
 	public CompressedDAWGSet getDawg() {
@@ -76,7 +90,13 @@ public class ScrabbleConfig {
 		
 		return multicast;
 		
-		
 	}
+	
+	@PostConstruct
+	public void setBoardTileServices() {
+		BoardTileBuilder.gameSessionService = gameSessionService;
+		BoardTileBuilder.applicationEventPublisher = applicationEventPublisher;
+	}
+	
 }
 

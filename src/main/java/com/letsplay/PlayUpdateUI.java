@@ -114,7 +114,7 @@ public class PlayUpdateUI {
 				}
 				
 			} catch (GameSessionNotFoundException e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
 			}
 		}
