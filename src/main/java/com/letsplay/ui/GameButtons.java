@@ -68,8 +68,10 @@ public class GameButtons extends CustomComponent {
 				
 				GameSession gameSession = gameSessionService.findBySessionName(userPage.getGameSessionName());
 				if (gameSession.getPlayChecker().check(wordChecker, gameSession.getBoardState())) {
+					
 					scoreBoard.setScore(gameSession.getPlayChecker().calculatePlay(gameSession.getBoardState()));
 					gameSession.getPlayChecker().finalizePlay(gameSession.getBoardState(), gameSession.getTileBag());
+				
 				} else {
 					
 					UndoPlayEvent event = gameSession.getPlayChecker().undoPlay(gameSession.getBoardState());
