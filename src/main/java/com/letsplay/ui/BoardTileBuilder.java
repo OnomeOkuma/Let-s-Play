@@ -50,7 +50,10 @@ public class BoardTileBuilder implements Serializable{
 		
 		
 		dropTarget.addDropListener(drop -> {
+			UserPage userPage = (UserPage) UI.getCurrent();
 			
+			GameArea gameArea = (GameArea) userPage.getContent();
+			if(gameArea.isYourTurn()) {
 			GridLayout grid = (GridLayout) drop.getComponent().getParent();
 			
 			for(int column = 0; column < 15 ; column++)
@@ -58,7 +61,7 @@ public class BoardTileBuilder implements Serializable{
 					
 					// Get the location of the tile on the layout.
 					if (grid.getComponent(column, row) == tile){
-						UserPage userPage = (UserPage) UI.getCurrent();
+						
 						
 						try {
 							GameSession gameSession = gameSessionService.findBySessionName(userPage.getGameSessionName());
@@ -105,7 +108,9 @@ public class BoardTileBuilder implements Serializable{
 					
 				}
 			
-			
+			}else {
+				Notification.show("It is not your turn", Type.ERROR_MESSAGE);
+			}
 		});
 		
 		return tile;

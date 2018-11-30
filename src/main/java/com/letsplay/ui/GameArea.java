@@ -12,6 +12,7 @@ import com.letsplay.events.PlayInviteEvent;
 import com.letsplay.logic.Tilebag;
 import com.letsplay.repository.GameSession;
 import com.letsplay.service.GameSessionService;
+import com.letsplay.utils.EmptyTileBagException;
 import com.letsplay.utils.GameSessionNotFoundException;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.VaadinSessionScope;
@@ -34,7 +35,7 @@ public class GameArea extends CustomComponent{
 	public Board board;
 	private HorizontalLayout mainLayout;
 	private RadioButtonGroup<String> players;
-	
+	private GameButtons buttonArea;
 
 	private UserRack rack;
 	private ApplicationEventPublisher applicationEventPublisher;
@@ -56,8 +57,17 @@ public class GameArea extends CustomComponent{
 		Tilebag tileBag = new Tilebag();
 		
 		for (int temp = 0; temp < 7; temp++){
-			GameTile gameTile = tileBag.getTile();
-			this.rack.addTile(gameTile);
+			GameTile gameTile;
+			try {
+				
+				gameTile = tileBag.getTile();
+				this.rack.addTile(gameTile);
+				
+			} catch (EmptyTileBagException e) {
+				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+				e.printStackTrace();
+			}
+			
 		}
 		
 		this.players = new RadioButtonGroup<String>();
@@ -89,10 +99,10 @@ public class GameArea extends CustomComponent{
 			}
 		});
 		
-		GameButtons buttonArea = gamebuttons;
+		this.buttonArea = gamebuttons;
 		this.mainLayout = new HorizontalLayout();
 		VerticalLayout layout = new VerticalLayout(this.board, this.rack);
-		this.mainLayout.addComponents(this.players, layout, buttonArea);
+		this.mainLayout.addComponents(this.players, layout, this.buttonArea);
 
 		setCompositionRoot(this.mainLayout);
 
@@ -118,8 +128,32 @@ public class GameArea extends CustomComponent{
 	}
 	
 	public void updateUsersList(Set<String> username) {
-
-		this.players.setItems(username);
-		
+		this.players.setItems(username);	
 	}
+	
+	public void setPlayer1Name(String name) {
+		this.buttonArea.setPlayer1Name(name);
+	}
+	
+	public void setPlayer2Name(String name) {
+		this.buttonArea.setPlayer2Name(name);
+	}
+	
+	public void setPlayer2Score(int score) {
+		this.buttonArea.setPlayer2Score(score);
+	}
+	
+	public void yourTurn() {
+		this.buttonArea.yourTurn();
+	}
+	
+	public void notYourTurn() {
+		this.buttonArea.notYourTurn();
+	}
+	
+	public boolean isYourTurn() {
+		return this.buttonArea.isYourTurn();
+	}
+	
+	
 }

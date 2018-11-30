@@ -14,7 +14,10 @@ import com.letsplay.events.UndoPlayEvent;
 import com.letsplay.ui.BoardTile;
 import com.letsplay.ui.GameArea;
 import com.letsplay.ui.GameTileBuilder;
+import com.letsplay.utils.EmptyTileBagException;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.Notification.Type;
 
 
 public class PlayChecker implements Serializable {
@@ -465,7 +468,15 @@ public class PlayChecker implements Serializable {
 		GameArea gameArea = (GameArea)UI.getCurrent().getContent();
 		for(int counter = 0; counter < this.playHolder.size(); counter++)
 			if(tileBag.tilesRemaining() > 0) {
-				gameArea.addTileToRack(tileBag.getTile());
+				try {
+					
+					gameArea.addTileToRack(tileBag.getTile());
+					
+				} catch (EmptyTileBagException e) {
+					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+					e.printStackTrace();
+					break;
+				}
 			}
 		
 		

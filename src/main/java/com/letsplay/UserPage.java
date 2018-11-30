@@ -51,13 +51,15 @@ public class UserPage extends UI {
 	@Override
 	protected void init(VaadinRequest request) {
 		this.setContent(gameArea);
+		
+		
 		WrappedHttpSession wrapper = (WrappedHttpSession) request.getWrappedSession();
 		
 		if(!sessionList.containsKey(request.getRemoteUser())) {
 			
 			this.setCurrentUser(request.getRemoteUser());
 			this.setGameSessionName("");
-			
+			this.gameArea.setPlayer1Name(request.getRemoteUser());
 			sessionList.put(request.getRemoteUser(), wrapper);
 			LoginEvent loginEvent = new LoginEvent(this, request.getRemoteUser());
 			applicationEventPublisher.publishEvent(loginEvent);

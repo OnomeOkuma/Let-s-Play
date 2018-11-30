@@ -11,6 +11,7 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 import com.letsplay.events.PlayEvent;
+import com.letsplay.events.ScoreEvent;
 import com.letsplay.events.UndoPlayEvent;
 import com.letsplay.logic.BoardPosition;
 import com.letsplay.logic.PlayChecker;
@@ -119,4 +120,42 @@ public class PlayUpdateUI {
 			}
 		}
 	}
+	
+	@JmsListener(destination = "${application.score}")
+	public void setScoreAndTurn(ScoreEvent event) {
+		
+		if(sessionList.containsKey(event.getNotifyPlayer())) {
+			try {
+				@SuppressWarnings("unused")
+				GameSession gameSession = gameSessionService.findByPlayers(event.getNotifyPlayer());
+				WrappedHttpSession session = sessionList.get(event.getNotifyPlayer());
+				
+				Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
+				VaadinSession vaaSession = vaadinSessions.iterator().next();
+				Collection<UI> uis = vaaSession.getUIs();
+				UserPage ui = (UserPage) uis.iterator().next();
+				
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						
+						GameArea gameArea = (GameArea)ui.getContent();
+						gameArea.setPlayer2Score(event.getScore());
+						gameArea.yourTurn();
+						
+						ui.push();
+					}
+					
+				});
+				
+				
+			} catch (GameSessionNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
 }

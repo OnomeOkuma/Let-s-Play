@@ -22,6 +22,7 @@ import com.letsplay.repository.ActivePlayer;
 import com.letsplay.repository.GameSession;
 import com.letsplay.service.ActivePlayerService;
 import com.letsplay.service.GameSessionService;
+import com.letsplay.ui.GameArea;
 import com.letsplay.utils.ActivePlayerNotFoundException;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedHttpSession;
@@ -159,6 +160,8 @@ public class UpdateUI {
 
 						@Override
 						public void run() {
+							GameArea gameArea = (GameArea)ui.getContent();
+							gameArea.setPlayer2Name(event.getFromPlayer());
 							Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
 							ui.push();
 						}
@@ -167,6 +170,7 @@ public class UpdateUI {
 
 					PlayAcceptEvent acceptEvent = new PlayAcceptEvent("Accept");
 					acceptEvent.setNotifyPlayer(event.getFromPlayer());
+					acceptEvent.setFromPlayer(event.getToPlayer());
 					acceptEvent.setGameSessionName(gameSession.getName());
 					
 					applicationEventPublisher.publishEvent(acceptEvent);
@@ -208,7 +212,11 @@ public class UpdateUI {
 
 				@Override
 				public void run() {
-
+					GameArea gameArea = (GameArea)ui.getContent();
+		
+					gameArea.setPlayer2Name(event.getFromPlayer());
+					gameArea.yourTurn();
+					
 					Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
 					ui.push();
 

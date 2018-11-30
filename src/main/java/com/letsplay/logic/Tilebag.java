@@ -9,6 +9,7 @@ import java.util.Random;
 
 import com.letsplay.ui.GameTile;
 import com.letsplay.ui.GameTileBuilder;
+import com.letsplay.utils.EmptyTileBagException;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractComponent;
 
@@ -70,11 +71,15 @@ public class Tilebag implements Serializable{
 	}
 	
 	
-	public GameTile getTile() {
-		int temp = this.random.nextInt(this.limit);
-		Tilestate tileState = this.stateContainer.remove(temp);
-		this.limit--;
-		return GameTileBuilder.get().setWeight(tileState).build();
+	public GameTile getTile() throws EmptyTileBagException {
+		if (this.stateContainer.size() != 0) {
+			int temp = this.random.nextInt(this.limit);
+			Tilestate tileState = this.stateContainer.remove(temp);
+			this.limit--;
+			return GameTileBuilder.get().setWeight(tileState).build();
+		} else {
+			throw new EmptyTileBagException("Empty Tilebage");
+		}
 	}
 	
 	public int tilesRemaining() {
