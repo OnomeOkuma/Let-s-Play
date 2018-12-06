@@ -85,8 +85,9 @@ public class TileExchange extends Window{
 					BoardTileBuilder.applicationEventPublisher.publishEvent(event);
 					
 				} catch (GameSessionNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					
+					Notification.show("User has not entered into a Gaming Session", Type.ERROR_MESSAGE);
+
 				}
 				
 			}

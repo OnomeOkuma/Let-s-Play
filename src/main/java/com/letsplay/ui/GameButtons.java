@@ -12,8 +12,10 @@ import org.vaadin.teemu.switchui.Switch;
 
 import com.letsplay.UserPage;
 import com.letsplay.events.LogoutEvent;
+import com.letsplay.events.LogoutSessionEvent;
 import com.letsplay.events.ScoreEvent;
 import com.letsplay.events.UndoPlayEvent;
+import com.letsplay.repository.ActivePlayer;
 import com.letsplay.repository.GameSession;
 import com.letsplay.service.ActivePlayerService;
 import com.letsplay.service.GameSessionService;
@@ -74,52 +76,58 @@ public class GameButtons extends CustomComponent {
 
 		playButton.setWidth("160px");
 		playButton.addClickListener(click -> {
-
 			UserPage userPage = (UserPage) UI.getCurrent();
-			try {
+			GameArea gameArea = (GameArea) userPage.getContent();
+			if (gameArea.isYourTurn()) {
 
-				GameSession gameSession = gameSessionService.findBySessionName(userPage.getGameSessionName());
 				try {
-					if (gameSession.getPlayChecker().check(wordChecker, gameSession.getBoardState())) {
 
-						int score = gameSession.getPlayChecker().calculatePlay(gameSession.getBoardState());
-						scoreBoard1.setScore(score);
-						gameSession.getPlayChecker().finalizePlay(gameSession.getBoardState(), gameSession.getTileBag());
+					GameSession gameSession = gameSessionService.findBySessionName(userPage.getGameSessionName());
+					try {
+						if (gameSession.getPlayChecker().check(wordChecker, gameSession.getBoardState())) {
 
-						GameArea gameArea = (GameArea) userPage.getContent();
-						gameArea.notYourTurn();
+							int score = gameSession.getPlayChecker().calculatePlay(gameSession.getBoardState());
+							scoreBoard1.setScore(score);
+							gameSession.getPlayChecker().finalizePlay(gameSession.getBoardState(),
+									gameSession.getTileBag());
 
-						ScoreEvent event = new ScoreEvent("Score");
+							gameArea.notYourTurn();
 
-						if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
-							event.setNotifyPlayer(gameSession.getPlayer2().getName());
-						else
-							event.setNotifyPlayer(gameSession.getPlayer1().getName());
+							ScoreEvent event = new ScoreEvent("Score");
 
-						event.setScore(score);
+							if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
+								event.setNotifyPlayer(gameSession.getPlayer2().getName());
+							else
+								event.setNotifyPlayer(gameSession.getPlayer1().getName());
 
-						applicationEventPublisher.publishEvent(event);
+							event.setScore(score);
 
-					} else {
+							applicationEventPublisher.publishEvent(event);
 
-						UndoPlayEvent event = gameSession.getPlayChecker().undoPlay(gameSession.getBoardState());
-						if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
-							event.setNotifyPlayer(gameSession.getPlayer2().getName());
-						else
-							event.setNotifyPlayer(gameSession.getPlayer1().getName());
+						} else {
 
-						applicationEventPublisher.publishEvent(event);
+							UndoPlayEvent event = gameSession.getPlayChecker().undoPlay(gameSession.getBoardState());
+							if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
+								event.setNotifyPlayer(gameSession.getPlayer2().getName());
+							else
+								event.setNotifyPlayer(gameSession.getPlayer1().getName());
+
+							applicationEventPublisher.publishEvent(event);
+						}
+					} catch (Exception e) {
+						Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 					}
-				} catch (Exception e) {
-					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+
+					gameSessionService.saveSession(gameSession);
+
+				} catch (GameSessionNotFoundException e) {
+
+					Notification.show("User has not entered into a Gaming Session", Type.ERROR_MESSAGE);
+
 				}
-
-				gameSessionService.saveSession(gameSession);
-
-			} catch (GameSessionNotFoundException e) {
-
+			} else {
+				Notification.show("It is not your turn", Type.ERROR_MESSAGE);
 			}
-
 		});
 
 		Button exchangeTileButton = new Button("Exchange Tile");
@@ -128,10 +136,10 @@ public class GameButtons extends CustomComponent {
 			UserPage userPage = (UserPage) UI.getCurrent();
 			GameArea gameArea = (GameArea) userPage.getContent();
 			if (gameArea.isYourTurn()) {
-				
+
 				TileExchange exchange = new TileExchange();
 				UI.getCurrent().addWindow(exchange);
-				
+
 			} else {
 				Notification.show("It is not your turn", Type.ERROR_MESSAGE);
 			}
@@ -140,7 +148,7 @@ public class GameButtons extends CustomComponent {
 		Button skipTurnButton = new Button("Pass");
 		skipTurnButton.setWidth("160px");
 		skipTurnButton.addClickListener(click -> {
-			
+
 			UserPage userPage = (UserPage) UI.getCurrent();
 			GameArea gameArea = (GameArea) userPage.getContent();
 			if (gameArea.isYourTurn()) {
@@ -151,23 +159,21 @@ public class GameButtons extends CustomComponent {
 						event.setNotifyPlayer(gameSession.getPlayer2().getName());
 					else
 						event.setNotifyPlayer(gameSession.getPlayer1().getName());
-					
+
 					event.setScore(0);
 					applicationEventPublisher.publishEvent(event);
 					gameArea.notYourTurn();
-					
+
 				} catch (GameSessionNotFoundException e) {
-					
-					e.printStackTrace();
+
+					Notification.show("User has not entered into a Gaming Session", Type.ERROR_MESSAGE);
+
 				}
-				
-				
-				
+
 			} else {
 				Notification.show("It is not your turn", Type.ERROR_MESSAGE);
 			}
 
-			
 		});
 		Button surrenderButton = new Button("Surrender");
 		surrenderButton.setWidth("160px");
@@ -177,9 +183,30 @@ public class GameButtons extends CustomComponent {
 
 			String userToLogout = vaadinSecurity.getAuthentication().getName();
 			sessionList.remove(userToLogout);
-			activePlayerService.deleteByName(userToLogout);
-			vaadinSecurity.logout();
+			UserPage userPage = (UserPage) UI.getCurrent();
+			if (!userPage.getGameSessionName().equals("")) {
+				try {
 
+					GameSession gameSession = gameSessionService.findBySessionName(userPage.getGameSessionName());
+					ActivePlayer player1 = gameSession.getPlayer1();
+					ActivePlayer player2 = gameSession.getPlayer2();
+
+					LogoutSessionEvent event = new LogoutSessionEvent("logout");
+					if (player1.getName().equals(userPage.getCurrentUser()))
+						event.setNotifyPlayer(player2.getName());
+					else
+						event.setNotifyPlayer(player1.getName());
+
+					gameSessionService.deleteGameSession(gameSession);
+					applicationEventPublisher.publishEvent(event);
+
+				} catch (GameSessionNotFoundException e) {
+					
+					e.printStackTrace();
+				}
+			}
+			vaadinSecurity.logout();
+			activePlayerService.deleteByName(userToLogout);
 			logger.info("Logout complete.............");
 
 			LogoutEvent event = new LogoutEvent(this, userToLogout);

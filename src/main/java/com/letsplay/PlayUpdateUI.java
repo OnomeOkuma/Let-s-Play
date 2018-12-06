@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
+import com.letsplay.events.LogoutSessionEvent;
 import com.letsplay.events.PlayEvent;
 import com.letsplay.events.ScoreEvent;
 import com.letsplay.events.UndoPlayEvent;
@@ -24,7 +25,9 @@ import com.letsplay.ui.GameTileBuilder;
 import com.letsplay.utils.GameSessionNotFoundException;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedHttpSession;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.Notification.Type;
 
 @Component
 public class PlayUpdateUI {
@@ -195,4 +198,27 @@ public class PlayUpdateUI {
 		
 	}
 	
+	@JmsListener(destination = "${application.endgameplay}")
+	public void setTurn(LogoutSessionEvent event) {
+		if(sessionList.containsKey(event.getNotifyPlayer())) {
+			WrappedHttpSession session = sessionList.get(event.getNotifyPlayer());
+			
+			Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
+			VaadinSession vaaSession = vaadinSessions.iterator().next();
+			Collection<UI> uis = vaaSession.getUIs();
+			UserPage ui = (UserPage) uis.iterator().next();
+			
+			ui.access(new Runnable() {
+
+				@Override
+				public void run() {
+					
+					Notification.show("Opponent has left the game", Type.ERROR_MESSAGE);
+					
+					ui.push();
+				}
+				
+			});
+		}
+	}
 }
