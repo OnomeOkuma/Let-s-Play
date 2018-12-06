@@ -75,7 +75,7 @@ public class Tilebag implements Serializable{
 		if (this.stateContainer.size() != 0) {
 			int temp = this.random.nextInt(this.limit);
 			Tilestate tileState = this.stateContainer.remove(temp);
-			this.limit--;
+			this.limit = this.limit - 1;
 			return GameTileBuilder.get().setWeight(tileState).build();
 		} else {
 			throw new EmptyTileBagException("Empty Tilebage");
@@ -91,6 +91,7 @@ public class Tilebag implements Serializable{
 		if(gameTile.isPresent())
 			Tile = (GameTile) gameTile.get();
 		this.stateContainer.add((Tilestate)Tile.getData());
+		this.limit++;
 	}
 	
 	public String toString() {

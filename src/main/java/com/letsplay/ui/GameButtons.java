@@ -79,35 +79,39 @@ public class GameButtons extends CustomComponent {
 			try {
 
 				GameSession gameSession = gameSessionService.findBySessionName(userPage.getGameSessionName());
-				if (gameSession.getPlayChecker().check(wordChecker, gameSession.getBoardState())) {
+				try {
+					if (gameSession.getPlayChecker().check(wordChecker, gameSession.getBoardState())) {
 
-					int score = gameSession.getPlayChecker().calculatePlay(gameSession.getBoardState());
-					scoreBoard1.setScore(score);
-					gameSession.getPlayChecker().finalizePlay(gameSession.getBoardState(), gameSession.getTileBag());
+						int score = gameSession.getPlayChecker().calculatePlay(gameSession.getBoardState());
+						scoreBoard1.setScore(score);
+						gameSession.getPlayChecker().finalizePlay(gameSession.getBoardState(), gameSession.getTileBag());
 
-					GameArea gameArea = (GameArea) userPage.getContent();
-					gameArea.notYourTurn();
+						GameArea gameArea = (GameArea) userPage.getContent();
+						gameArea.notYourTurn();
 
-					ScoreEvent event = new ScoreEvent("Score");
+						ScoreEvent event = new ScoreEvent("Score");
 
-					if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
-						event.setNotifyPlayer(gameSession.getPlayer2().getName());
-					else
-						event.setNotifyPlayer(gameSession.getPlayer1().getName());
+						if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
+							event.setNotifyPlayer(gameSession.getPlayer2().getName());
+						else
+							event.setNotifyPlayer(gameSession.getPlayer1().getName());
 
-					event.setScore(score);
+						event.setScore(score);
 
-					applicationEventPublisher.publishEvent(event);
+						applicationEventPublisher.publishEvent(event);
 
-				} else {
+					} else {
 
-					UndoPlayEvent event = gameSession.getPlayChecker().undoPlay(gameSession.getBoardState());
-					if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
-						event.setNotifyPlayer(gameSession.getPlayer2().getName());
-					else
-						event.setNotifyPlayer(gameSession.getPlayer1().getName());
+						UndoPlayEvent event = gameSession.getPlayChecker().undoPlay(gameSession.getBoardState());
+						if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
+							event.setNotifyPlayer(gameSession.getPlayer2().getName());
+						else
+							event.setNotifyPlayer(gameSession.getPlayer1().getName());
 
-					applicationEventPublisher.publishEvent(event);
+						applicationEventPublisher.publishEvent(event);
+					}
+				} catch (Exception e) {
+					Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 				}
 
 				gameSessionService.saveSession(gameSession);
@@ -124,7 +128,10 @@ public class GameButtons extends CustomComponent {
 			UserPage userPage = (UserPage) UI.getCurrent();
 			GameArea gameArea = (GameArea) userPage.getContent();
 			if (gameArea.isYourTurn()) {
-				UI.getCurrent().addWindow(new TileExchange());
+				
+				TileExchange exchange = new TileExchange();
+				UI.getCurrent().addWindow(exchange);
+				
 			} else {
 				Notification.show("It is not your turn", Type.ERROR_MESSAGE);
 			}
@@ -132,7 +139,36 @@ public class GameButtons extends CustomComponent {
 
 		Button skipTurnButton = new Button("Pass");
 		skipTurnButton.setWidth("160px");
+		skipTurnButton.addClickListener(click -> {
+			
+			UserPage userPage = (UserPage) UI.getCurrent();
+			GameArea gameArea = (GameArea) userPage.getContent();
+			if (gameArea.isYourTurn()) {
+				try {
+					GameSession gameSession = gameSessionService.findBySessionName(userPage.getGameSessionName());
+					ScoreEvent event = new ScoreEvent("Score");
+					if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
+						event.setNotifyPlayer(gameSession.getPlayer2().getName());
+					else
+						event.setNotifyPlayer(gameSession.getPlayer1().getName());
+					
+					event.setScore(0);
+					applicationEventPublisher.publishEvent(event);
+					gameArea.notYourTurn();
+					
+				} catch (GameSessionNotFoundException e) {
+					
+					e.printStackTrace();
+				}
+				
+				
+				
+			} else {
+				Notification.show("It is not your turn", Type.ERROR_MESSAGE);
+			}
 
+			
+		});
 		Button surrenderButton = new Button("Surrender");
 		surrenderButton.setWidth("160px");
 

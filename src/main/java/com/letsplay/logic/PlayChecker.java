@@ -162,7 +162,10 @@ public class PlayChecker implements Serializable {
 	}
 	
 	// Checks if the play made is correct.
-	public boolean check(CompressedDAWGSet wordChecker, Boardstate boardState){
+	public boolean check(CompressedDAWGSet wordChecker, Boardstate boardState) throws Exception{
+		if(this.playHolder.isEmpty())
+			throw new Exception("A Tile has to be placed on the board first");
+		
 		if(this.playHolder.navigableKeySet().size() > 1) {
 			if(this.isFirstPlay)
 				return (this.checkSingleFile(boardState) && 

@@ -158,4 +158,41 @@ public class PlayUpdateUI {
 		
 	}
 	
+	
+	@JmsListener(destination = "${application.pass}")
+	public void setTurn(ScoreEvent event) {
+		
+		if(sessionList.containsKey(event.getNotifyPlayer())) {
+			try {
+				@SuppressWarnings("unused")
+				GameSession gameSession = gameSessionService.findByPlayers(event.getNotifyPlayer());
+				WrappedHttpSession session = sessionList.get(event.getNotifyPlayer());
+				
+				Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
+				VaadinSession vaaSession = vaadinSessions.iterator().next();
+				Collection<UI> uis = vaaSession.getUIs();
+				UserPage ui = (UserPage) uis.iterator().next();
+				
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						
+						GameArea gameArea = (GameArea)ui.getContent();
+						gameArea.yourTurn();
+						
+						ui.push();
+					}
+					
+				});
+				
+				
+			} catch (GameSessionNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
 }

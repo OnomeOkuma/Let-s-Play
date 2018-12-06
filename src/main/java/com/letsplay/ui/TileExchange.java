@@ -3,6 +3,7 @@ package com.letsplay.ui;
 import java.util.Optional;
 
 import com.letsplay.UserPage;
+import com.letsplay.events.ScoreEvent;
 import com.letsplay.repository.GameSession;
 import com.letsplay.utils.EmptyTileBagException;
 import com.letsplay.utils.GameSessionNotFoundException;
@@ -22,7 +23,7 @@ public class TileExchange extends Window{
 	 */
 	private static final long serialVersionUID = 2977180198891696652L;
 	private int counter;
-	
+
 	public TileExchange() {
 		super("Exchange Tile");
 		
@@ -45,8 +46,11 @@ public class TileExchange extends Window{
 					gameSession.getTileBag().returnTile(gameTile);
 					gameArea.removeTileFromRack((GameTile)gameTile.get());
 					try {
-						gameArea.addTileToRack(gameSession.getTileBag().getTile());
+						GameTile tile = gameSession.getTileBag().getTile();
+						gameArea.addTileToRack(tile);
 						this.counter--;
+						gameArea.notYourTurn();
+						BoardTileBuilder.gameSessionService.saveSession(gameSession);
 					} catch (EmptyTileBagException e) {
 						Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 						e.printStackTrace();
@@ -66,6 +70,28 @@ public class TileExchange extends Window{
 		setWidth("300px");
 		setContent(dropArea);
 		setModal(false);
+		this.addCloseListener(listener -> {
+			if(!gameArea.isYourTurn()) {
+				
+				try {
+					GameSession gameSession = BoardTileBuilder.gameSessionService.findBySessionName(userPage.getGameSessionName());
+					ScoreEvent event = new ScoreEvent("Score");
+					if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
+						event.setNotifyPlayer(gameSession.getPlayer2().getName());
+					else
+						event.setNotifyPlayer(gameSession.getPlayer1().getName());
+					
+					event.setScore(0);
+					BoardTileBuilder.applicationEventPublisher.publishEvent(event);
+					
+				} catch (GameSessionNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		
 		center();
 	}
 	
