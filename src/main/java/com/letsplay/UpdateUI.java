@@ -24,6 +24,8 @@ import com.letsplay.service.ActivePlayerService;
 import com.letsplay.service.GameSessionService;
 import com.letsplay.ui.GameArea;
 import com.letsplay.utils.ActivePlayerNotFoundException;
+import com.letsplay.utils.EmptyTileBagException;
+import com.letsplay.utils.GameSessionNotFoundException;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedHttpSession;
 import com.vaadin.ui.Button;
@@ -160,10 +162,27 @@ public class UpdateUI {
 
 						@Override
 						public void run() {
-							GameArea gameArea = (GameArea)ui.getContent();
-							gameArea.setPlayer2Name(event.getFromPlayer());
-							Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
-							ui.push();
+							try {
+								GameSession gameSession = gameSessionService.findByPlayers(ui.getCurrentUser());
+								GameArea gameArea = (GameArea)ui.getContent();
+								gameArea.clearPlayerRack();
+								for(int counter = 0; counter != 7; counter++ ) {
+									try {
+										gameArea.addTileToRack(gameSession.getTileBag().getTile());
+									} catch (EmptyTileBagException e) {
+										Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+									}
+								}
+								gameArea.setPlayer2Name(event.getFromPlayer());
+								Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
+								gameSessionService.saveSession(gameSession);
+								ui.push();
+							} catch (GameSessionNotFoundException e) {
+								
+								Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+								
+							}
+						
 						}
 
 					});
@@ -212,10 +231,26 @@ public class UpdateUI {
 
 				@Override
 				public void run() {
-					GameArea gameArea = (GameArea)ui.getContent();
-		
-					gameArea.setPlayer2Name(event.getFromPlayer());
-					gameArea.yourTurn();
+					GameSession gameSession;
+					try {
+						gameSession = gameSessionService.findByPlayers(ui.getCurrentUser());
+						GameArea gameArea = (GameArea)ui.getContent();
+						gameArea.clearPlayerRack();
+						for(int counter = 0; counter != 7; counter++ ) {
+							try {
+								gameArea.addTileToRack(gameSession.getTileBag().getTile());
+							} catch (EmptyTileBagException e) {
+								Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+							}
+						}
+						gameSessionService.saveSession(gameSession);
+						gameArea.setPlayer2Name(event.getFromPlayer());
+						gameArea.yourTurn();
+						
+					} catch (GameSessionNotFoundException e1) {
+						// TODO Auto-generated catch block
+						Notification.show(e1.getMessage(), Type.ERROR_MESSAGE);
+					}
 					
 					Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
 					ui.push();

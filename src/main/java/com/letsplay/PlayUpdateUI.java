@@ -212,7 +212,8 @@ public class PlayUpdateUI {
 
 				@Override
 				public void run() {
-					
+					GameArea gameArea = (GameArea)ui.getContent();
+					gameArea.reset();
 					Notification.show("Opponent has left the game", Type.ERROR_MESSAGE);
 					
 					ui.push();

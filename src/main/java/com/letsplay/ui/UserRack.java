@@ -29,4 +29,8 @@ public class UserRack extends CustomComponent {
 	protected void removeTile(GameTile gameTile) {
 		this.layout.removeComponent(gameTile);
 	}
+	
+	protected void clearRack() {
+		this.layout.removeAllComponents();
+	}
 }

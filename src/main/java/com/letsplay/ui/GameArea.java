@@ -32,7 +32,7 @@ public class GameArea extends CustomComponent{
 	 * 
 	 */
 	private static final long serialVersionUID = 1445297031956063093L;
-	public Board board;
+	private Board board;
 	private HorizontalLayout mainLayout;
 	private RadioButtonGroup<String> players;
 	private GameButtons buttonArea;
@@ -155,5 +155,11 @@ public class GameArea extends CustomComponent{
 		return this.buttonArea.isYourTurn();
 	}
 	
+	public void reset() {
+		this.board.reset();
+	}
 	
+	public void clearPlayerRack() {
+		this.rack.clearRack();
+	}
 }
