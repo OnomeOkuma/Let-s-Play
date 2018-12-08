@@ -199,7 +199,7 @@ public class PlayUpdateUI {
 	}
 	
 	@JmsListener(destination = "${application.endgameplay}")
-	public void setTurn(LogoutSessionEvent event) {
+	public void logoutListener(LogoutSessionEvent event) {
 		if(sessionList.containsKey(event.getNotifyPlayer())) {
 			WrappedHttpSession session = sessionList.get(event.getNotifyPlayer());
 			
@@ -214,6 +214,10 @@ public class PlayUpdateUI {
 				public void run() {
 					GameArea gameArea = (GameArea)ui.getContent();
 					gameArea.reset();
+					gameArea.notYourTurn();
+					gameArea.resetScorePlayer1();
+					gameArea.setPlayer2Name("");
+					gameArea.resetScorePlayer2();
 					Notification.show("Opponent has left the game", Type.ERROR_MESSAGE);
 					
 					ui.push();

@@ -163,6 +163,7 @@ public class UpdateUI {
 						@Override
 						public void run() {
 							try {
+								
 								GameSession gameSession = gameSessionService.findByPlayers(ui.getCurrentUser());
 								GameArea gameArea = (GameArea)ui.getContent();
 								gameArea.clearPlayerRack();
@@ -173,9 +174,18 @@ public class UpdateUI {
 										Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
 									}
 								}
+								
 								gameArea.setPlayer2Name(event.getFromPlayer());
-								Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
+								
 								gameSessionService.saveSession(gameSession);
+								PlayAcceptEvent acceptEvent = new PlayAcceptEvent("Accept");
+								acceptEvent.setNotifyPlayer(event.getFromPlayer());
+								acceptEvent.setFromPlayer(event.getToPlayer());
+								acceptEvent.setGameSessionName(gameSession.getName());
+								
+								Notification.show("Game, Set, Match", Type.ERROR_MESSAGE);
+								applicationEventPublisher.publishEvent(acceptEvent);
+								
 								ui.push();
 							} catch (GameSessionNotFoundException e) {
 								
@@ -187,13 +197,7 @@ public class UpdateUI {
 
 					});
 
-					PlayAcceptEvent acceptEvent = new PlayAcceptEvent("Accept");
-					acceptEvent.setNotifyPlayer(event.getFromPlayer());
-					acceptEvent.setFromPlayer(event.getToPlayer());
-					acceptEvent.setGameSessionName(gameSession.getName());
 					
-					applicationEventPublisher.publishEvent(acceptEvent);
-
 				} catch (ActivePlayerNotFoundException e) {
 
 					e.printStackTrace();

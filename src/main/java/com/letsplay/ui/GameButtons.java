@@ -223,27 +223,35 @@ public class GameButtons extends CustomComponent {
 
 	}
 
-	public void setPlayer1Name(String name) {
+	protected void setPlayer1Name(String name) {
 		this.scoreBoard1.setName(name);
 	}
-
-	public void setPlayer2Name(String name) {
+	
+	public void resetScorePlayer1() {
+		this.scoreBoard1.resetScore();
+	}
+	
+	protected void setPlayer2Name(String name) {
 		this.scoreBoard2.setName(name);
 	}
 
-	public void setPlayer2Score(int score) {
+	protected void setPlayer2Score(int score) {
 		this.scoreBoard2.setScore(score);
 	}
-
-	public void yourTurn() {
+	
+	protected void resetScorePlayer2() {
+		this.scoreBoard2.resetScore();
+	}
+	
+	protected void yourTurn() {
 		this.turn.setValue(true);
 	}
 
-	public void notYourTurn() {
+	protected void notYourTurn() {
 		this.turn.setValue(false);
 	}
 
-	public boolean isYourTurn() {
+	protected boolean isYourTurn() {
 		return this.turn.getValue();
 	}
 }

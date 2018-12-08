@@ -2,6 +2,8 @@ package com.letsplay.serviceImpl;
 
 import java.util.ArrayList;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -14,6 +16,7 @@ import com.letsplay.repository.Player;
 import com.letsplay.repository.PlayerRepository;
 
 @Service
+@Transactional
 public class UserDetail implements UserDetailsService {
 	
 	@Autowired
@@ -37,5 +40,5 @@ public class UserDetail implements UserDetailsService {
 		}
 		
 	}
-
+	
 }

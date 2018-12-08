@@ -135,6 +135,14 @@ public class GameArea extends CustomComponent{
 		this.buttonArea.setPlayer1Name(name);
 	}
 	
+	public void resetScorePlayer1() {
+		this.buttonArea.resetScorePlayer1();
+	}
+	
+	public void resetScorePlayer2() {
+		this.buttonArea.resetScorePlayer2();
+	}
+	
 	public void setPlayer2Name(String name) {
 		this.buttonArea.setPlayer2Name(name);
 	}
