@@ -13,16 +13,20 @@ import org.springframework.stereotype.Component;
 import com.letsplay.events.LogoutSessionEvent;
 import com.letsplay.events.PlayEvent;
 import com.letsplay.events.ScoreEvent;
+import com.letsplay.events.SurrenderEvent;
 import com.letsplay.events.UndoPlayEvent;
 import com.letsplay.logic.BoardPosition;
 import com.letsplay.logic.PlayChecker;
 import com.letsplay.repository.GameSession;
+import com.letsplay.repository.Player;
 import com.letsplay.service.GameSessionService;
+import com.letsplay.service.SignupService;
 import com.letsplay.ui.BoardTileBuilder;
 import com.letsplay.ui.GameArea;
 import com.letsplay.ui.GameTile;
 import com.letsplay.ui.GameTileBuilder;
 import com.letsplay.utils.GameSessionNotFoundException;
+import com.letsplay.utils.PlayerNotFoundException;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedHttpSession;
 import com.vaadin.ui.Notification;
@@ -37,6 +41,9 @@ public class PlayUpdateUI {
 	
 	@Autowired
 	private GameSessionService gameSessionService;
+	
+	@Autowired
+	private SignupService playerService;
 	
 	@Autowired
 	BoardTileBuilder boardTileBuilder;
@@ -218,11 +225,66 @@ public class PlayUpdateUI {
 					gameArea.resetScorePlayer1();
 					gameArea.setPlayer2Name("");
 					gameArea.resetScorePlayer2();
-					Notification.show("Opponent has left the game", Type.ERROR_MESSAGE);
+					ui.setGameSessionName("");
+					Notification.show("Opponent is no longer online", Type.ERROR_MESSAGE);
 					
 					ui.push();
 				}
 				
+			});
+		}
+	}	
+	
+	@JmsListener(destination = "${application.surrender}")
+	public void surrender(SurrenderEvent event) {
+		if (sessionList.containsKey(event.getWinner())) {
+			WrappedHttpSession session = sessionList.get(event.getWinner());
+
+			Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
+			VaadinSession vaaSession = vaadinSessions.iterator().next();
+			Collection<UI> uis = vaaSession.getUIs();
+			UserPage ui = (UserPage) uis.iterator().next();
+			
+			try {
+				
+				Player player1 = playerService.getPlayer(event.getLoser());
+				Player player2 = playerService.getPlayer(event.getWinner());
+				
+				int wins = player2.getWins();
+				wins++;
+				player2.setWins(wins);
+				
+				int losses = player1.getLoses();
+				if(losses > 0) {
+					losses--;
+					player1.setLoses(losses);
+				}
+				
+				playerService.updatePlayer(player1);
+				playerService.updatePlayer(player2);
+				
+			} catch (PlayerNotFoundException e) {
+				
+				e.printStackTrace();
+			}
+			
+			
+			ui.access(new Runnable() {
+
+				@Override
+				public void run() {
+					GameArea gameArea = (GameArea) ui.getContent();
+					gameArea.reset();
+					gameArea.notYourTurn();
+					gameArea.resetScorePlayer1();
+					gameArea.setPlayer2Name("");
+					gameArea.resetScorePlayer2();
+					ui.setGameSessionName("");
+					Notification.show("Opponent surrendered. \n You were too awesome for him.", Type.ERROR_MESSAGE);
+
+					ui.push();
+				}
+
 			});
 		}
 	}

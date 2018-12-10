@@ -1,5 +1,6 @@
 package com.letsplay.ui;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -170,4 +171,13 @@ public class GameArea extends CustomComponent{
 	public void clearPlayerRack() {
 		this.rack.clearRack();
 	}
+	
+	public boolean isRackEmpty() {
+		return this.rack.isEmpty();
+	}
+	
+	public List<GameTile> getTilesRemaining(){
+		return this.rack.getTiles();
+	}
+	
 }

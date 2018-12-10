@@ -41,6 +41,8 @@ public class GameSession {
 	@Column(length=20000)
 	private Tilebag tileBag;
 	
+	private int endGameTurnsMissed;
+	
 	public ActivePlayer getPlayer1() {
 		return player1;
 	}
@@ -95,6 +97,14 @@ public class GameSession {
 
 	public void setTileBag(Tilebag tileBag) {
 		this.tileBag = tileBag;
+	}
+
+	public int getEndGameTurnsMissed() {
+		return endGameTurnsMissed;
+	}
+
+	public void setEndGameTurnsMissed(int endGameTurnsMissed) {
+		this.endGameTurnsMissed = endGameTurnsMissed;
 	}
 	
 }

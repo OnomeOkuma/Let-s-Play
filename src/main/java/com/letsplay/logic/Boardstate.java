@@ -200,7 +200,8 @@ public class Boardstate implements Serializable{
 	public boolean isOccupied(int column, int row){
 		BoardPosition temp = new BoardPosition(column, row);
 		
-		return this.occupiedPositions.contains(temp);
+		boolean value = this.occupiedPositions.contains(temp);
+		return value;
 		
 	}
 	

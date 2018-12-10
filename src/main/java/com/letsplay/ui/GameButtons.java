@@ -14,6 +14,7 @@ import com.letsplay.UserPage;
 import com.letsplay.events.LogoutEvent;
 import com.letsplay.events.LogoutSessionEvent;
 import com.letsplay.events.ScoreEvent;
+import com.letsplay.events.SurrenderEvent;
 import com.letsplay.events.UndoPlayEvent;
 import com.letsplay.repository.ActivePlayer;
 import com.letsplay.repository.GameSession;
@@ -93,17 +94,21 @@ public class GameButtons extends CustomComponent {
 
 							gameArea.notYourTurn();
 
-							ScoreEvent event = new ScoreEvent("Score");
+							if (!(gameArea.isRackEmpty() && gameSession.getTileBag().isTileBagEmpty())) {
+								ScoreEvent event = new ScoreEvent("Score");
 
-							if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
-								event.setNotifyPlayer(gameSession.getPlayer2().getName());
-							else
-								event.setNotifyPlayer(gameSession.getPlayer1().getName());
+								if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
+									event.setNotifyPlayer(gameSession.getPlayer2().getName());
+								else
+									event.setNotifyPlayer(gameSession.getPlayer1().getName());
 
-							event.setScore(score);
+								event.setScore(score);
 
-							applicationEventPublisher.publishEvent(event);
-
+								applicationEventPublisher.publishEvent(event);
+							} else {
+								// Add code for handling end game calculation.
+							}
+							
 						} else {
 
 							UndoPlayEvent event = gameSession.getPlayChecker().undoPlay(gameSession.getBoardState());
@@ -177,7 +182,42 @@ public class GameButtons extends CustomComponent {
 		});
 		Button surrenderButton = new Button("Surrender");
 		surrenderButton.setWidth("160px");
+		surrenderButton.addClickListener(listener -> {
+			UserPage userPage = (UserPage) UI.getCurrent();
+			GameArea gameArea = (GameArea) userPage.getContent();
+			if (!userPage.getGameSessionName().equals("")) {
+				try {
 
+					GameSession gameSession = gameSessionService.findBySessionName(userPage.getGameSessionName());
+					ActivePlayer player1 = gameSession.getPlayer1();
+					ActivePlayer player2 = gameSession.getPlayer2();
+
+					SurrenderEvent event = new SurrenderEvent("logout");
+					if (player1.getName().equals(userPage.getCurrentUser()))
+						event.setWinner(player2.getName());
+					else
+						event.setWinner(player1.getName());
+					
+					event.setLoser(userPage.getCurrentUser());
+					
+					gameSessionService.deleteGameSession(gameSession);
+					applicationEventPublisher.publishEvent(event);
+					gameArea.notYourTurn();
+					gameArea.reset();
+					gameArea.resetScorePlayer1();
+					gameArea.resetScorePlayer2();
+					gameArea.setPlayer2Name("");
+					
+					Notification.show("You surrendered thereby forfeiting the game", Type.ERROR_MESSAGE);
+					userPage.setGameSessionName("");
+				} catch (GameSessionNotFoundException e) {
+
+					Notification.show("User has not entered into a Gaming Session", Type.ERROR_MESSAGE);
+					
+				}
+			}
+		});
+		
 		Button logoutButton = new Button("Log Out");
 		logoutButton.addClickListener(listener -> {
 
@@ -199,10 +239,11 @@ public class GameButtons extends CustomComponent {
 
 					gameSessionService.deleteGameSession(gameSession);
 					applicationEventPublisher.publishEvent(event);
-
+					userPage.setGameSessionName("");
 				} catch (GameSessionNotFoundException e) {
-					
+
 					e.printStackTrace();
+					
 				}
 			}
 			vaadinSecurity.logout();
@@ -226,11 +267,11 @@ public class GameButtons extends CustomComponent {
 	protected void setPlayer1Name(String name) {
 		this.scoreBoard1.setName(name);
 	}
-	
+
 	public void resetScorePlayer1() {
 		this.scoreBoard1.resetScore();
 	}
-	
+
 	protected void setPlayer2Name(String name) {
 		this.scoreBoard2.setName(name);
 	}
@@ -238,11 +279,11 @@ public class GameButtons extends CustomComponent {
 	protected void setPlayer2Score(int score) {
 		this.scoreBoard2.setScore(score);
 	}
-	
+
 	protected void resetScorePlayer2() {
 		this.scoreBoard2.resetScore();
 	}
-	
+
 	protected void yourTurn() {
 		this.turn.setValue(true);
 	}

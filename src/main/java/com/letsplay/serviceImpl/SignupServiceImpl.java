@@ -1,9 +1,9 @@
 package com.letsplay.serviceImpl;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,10 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.letsplay.repository.Player;
 import com.letsplay.repository.PlayerRepository;
 import com.letsplay.service.SignupService;
+import com.letsplay.utils.PlayerNotFoundException;
 
 @Service
 @Transactional
-@Scope("singleton")
 public class SignupServiceImpl implements SignupService, Serializable{
 	
 	/**
@@ -30,10 +30,8 @@ public class SignupServiceImpl implements SignupService, Serializable{
 	
 	@Override
 	public boolean isUserRegistered(String player) {
-		Player temp = playerRepository.findByUserName(player);
-		if(temp == null)
-			return false;
-		else return true;
+		Optional<Player> temp = playerRepository.findByUserName(player);
+		return temp.isPresent();
 	}
 
 	@Override
@@ -43,4 +41,21 @@ public class SignupServiceImpl implements SignupService, Serializable{
 
 	}
 
+	@Override
+	public Player getPlayer(String username) throws PlayerNotFoundException {
+		Optional<Player> temp = playerRepository.findByUserName(username);
+		if(temp.isPresent())
+			return temp.get();
+		else
+			throw new PlayerNotFoundException("Player not found");
+
+	}
+
+	@Override
+	public void updatePlayer(Player player) {
+		
+		playerRepository.save(player);
+		
+	}
+	
 }

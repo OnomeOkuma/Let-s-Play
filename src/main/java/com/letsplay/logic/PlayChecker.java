@@ -128,11 +128,47 @@ public class PlayChecker implements Serializable {
 		return wordScoreMultiplier * score;
 	}
 	
+	private int calculateConnectedPlay(Boardstate boardState) {
+		NavigableSet<BoardPosition> tiles = this.playHolder.navigableKeySet();
+		Iterator<BoardPosition> iterator = tiles.iterator();
+		int score = 0;
+		
+		if (this.isColumn) {
+			while(iterator.hasNext()) {
+				BoardPosition position = iterator.next();
+				for(int columnCounter = position.getColumn() - 1; boardState.isOccupied(columnCounter, position.getRow()); columnCounter--) {
+					BoardPosition temp = boardState.getOccupiedPosition(columnCounter, position.getRow());
+					score += temp.getTileState().getWeight();
+				}
+				
+				for(int columnCounter = position.getColumn() + 1; boardState.isOccupied(columnCounter, position.getRow()); columnCounter++) {
+					BoardPosition temp = boardState.getOccupiedPosition(columnCounter, position.getRow());
+					score += temp.getTileState().getWeight();
+				}
+			}
+		}else {
+			while(iterator.hasNext()) {
+				BoardPosition position = iterator.next();
+				for(int rowCounter = position.getRow() - 1; boardState.isOccupied(rowCounter, position.getRow()); rowCounter--) {
+					BoardPosition temp = boardState.getOccupiedPosition(position.getColumn(), rowCounter);
+					score += temp.getTileState().getWeight();
+				}
+				
+				for(int rowCounter = position.getRow() + 1; boardState.isOccupied(rowCounter, position.getRow()); rowCounter++) {
+					BoardPosition temp = boardState.getOccupiedPosition(position.getColumn(), rowCounter);
+					score += temp.getTileState().getWeight();
+				}
+			}
+		}
+		
+
+		return score;
+}
 	
 	public int calculatePlay(Boardstate boardState) {
 		
 		if(this.playHolder.size() > 1)
-			return this.calculateMultiplePlay(boardState);
+			return this.calculateMultiplePlay(boardState) + this.calculateConnectedPlay(boardState);
 		
 		return this.calculateSinglePlay(boardState);
 		

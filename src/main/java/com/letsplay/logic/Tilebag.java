@@ -97,4 +97,9 @@ public class Tilebag implements Serializable{
 	public String toString() {
 		return this.stateContainer.toString();
 	}
+	
+	public boolean isTileBagEmpty() {
+		return this.stateContainer.isEmpty();
+	}
+	
 }

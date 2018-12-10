@@ -1,6 +1,7 @@
 package com.letsplay.serviceImpl;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -17,7 +18,7 @@ import com.letsplay.repository.PlayerRepository;
 
 @Service
 @Transactional
-public class UserDetail implements UserDetailsService {
+public class UserDetail implements UserDetailsService{
 	
 	@Autowired
 	PlayerRepository playerRepo;
@@ -25,8 +26,8 @@ public class UserDetail implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		// TODO Auto-generated method stub
-		Player player = playerRepo.findByUserName(username);
-		if(player == null)
+		Optional<Player> player = playerRepo.findByUserName(username);
+		if(!player.isPresent())
 			
 			throw new UsernameNotFoundException("Invalid Username");
 		
@@ -34,11 +35,11 @@ public class UserDetail implements UserDetailsService {
 			
 			ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>(2);
 			authorities.add(new SimpleGrantedAuthority("PLAYER"));
-			User user = new User(player.getUserName(), player.getPassword(),authorities);
+			User user = new User(player.get().getUserName(), player.get().getPassword(),authorities);
 			return user;
 			
 		}
 		
 	}
-	
+
 }
