@@ -7,9 +7,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
+import com.letsplay.events.EndgameEvent;
+import com.letsplay.events.FinalScoreEvent;
 import com.letsplay.events.LogoutSessionEvent;
 import com.letsplay.events.PlayEvent;
 import com.letsplay.events.ScoreEvent;
@@ -17,6 +20,7 @@ import com.letsplay.events.SurrenderEvent;
 import com.letsplay.events.UndoPlayEvent;
 import com.letsplay.logic.BoardPosition;
 import com.letsplay.logic.PlayChecker;
+import com.letsplay.logic.Tilestate;
 import com.letsplay.repository.GameSession;
 import com.letsplay.repository.Player;
 import com.letsplay.service.GameSessionService;
@@ -46,7 +50,10 @@ public class PlayUpdateUI {
 	private SignupService playerService;
 	
 	@Autowired
-	BoardTileBuilder boardTileBuilder;
+	private BoardTileBuilder boardTileBuilder;
+	
+	@Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 	
 	@JmsListener(destination = "${application.play}")
 	public void updateBoard(PlayEvent event) {
@@ -285,6 +292,63 @@ public class PlayUpdateUI {
 					ui.push();
 				}
 
+			});
+		}
+	}
+	
+	@JmsListener(destination = "${application.endgame}")
+	public void endgame(EndgameEvent event) {
+		if (sessionList.containsKey(event.getLoser())) {
+			WrappedHttpSession session = sessionList.get(event.getWinner());
+			Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
+			VaadinSession vaaSession = vaadinSessions.iterator().next();
+			Collection<UI> uis = vaaSession.getUIs();
+			UserPage ui = (UserPage) uis.iterator().next();
+			GameArea gameArea = (GameArea)ui.getContent();
+			
+			List<GameTile> tiles = gameArea.getTilesRemaining();
+			int scoreToAddForWinner = 0;
+			
+			for(GameTile tile : tiles) {
+				Tilestate state = (Tilestate)tile.getData();
+				scoreToAddForWinner += state.getWeight();
+			}
+			
+			int winnerScore = event.getWinnerScore() + (2 * scoreToAddForWinner);
+			ui.access(new Runnable() {
+
+				@Override
+				public void run() {
+					gameArea.setPlayer2Score(winnerScore);
+					Notification.show(event.getWinner() + " is the winner.", Type.ERROR_MESSAGE);
+				
+				}
+				
+			});
+			
+		}
+		
+	}
+	
+	@JmsListener(destination = "${application.endgame}")
+	public void finalscore(FinalScoreEvent event) {
+		if (sessionList.containsKey(event.getWinner())) {
+			WrappedHttpSession session = sessionList.get(event.getWinner());
+			Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
+			VaadinSession vaaSession = vaadinSessions.iterator().next();
+			Collection<UI> uis = vaaSession.getUIs();
+			UserPage ui = (UserPage) uis.iterator().next();
+			GameArea gameArea = (GameArea)ui.getContent();
+			gameArea.setPlayer1Score(event.getWinnerScore());
+			gameArea.setPlayer2Score(event.getLoserScore());
+			
+			ui.access(new Runnable() {
+
+				@Override
+				public void run() {
+					Notification.show("Congratulations \n you are the winner.", Type.ERROR_MESSAGE);
+				}
+				
 			});
 		}
 	}

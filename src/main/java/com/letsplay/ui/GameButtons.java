@@ -11,6 +11,7 @@ import org.vaadin.spring.security.shared.VaadinSharedSecurity;
 import org.vaadin.teemu.switchui.Switch;
 
 import com.letsplay.UserPage;
+import com.letsplay.events.EndgameEvent;
 import com.letsplay.events.LogoutEvent;
 import com.letsplay.events.LogoutSessionEvent;
 import com.letsplay.events.ScoreEvent;
@@ -107,6 +108,16 @@ public class GameButtons extends CustomComponent {
 								applicationEventPublisher.publishEvent(event);
 							} else {
 								// Add code for handling end game calculation.
+								EndgameEvent event = new EndgameEvent("end");
+								event.setWinner(userPage.getCurrentUser());
+								event.setWinnerScore(this.getPlayer1Score());
+								event.setLoserScore(this.getPlayer2Score());
+								if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
+									event.setLoser(gameSession.getPlayer2().getName());
+								else
+									event.setLoser(gameSession.getPlayer1().getName());
+								
+								applicationEventPublisher.publishEvent(event);
 							}
 							
 						} else {
@@ -116,7 +127,8 @@ public class GameButtons extends CustomComponent {
 								event.setNotifyPlayer(gameSession.getPlayer2().getName());
 							else
 								event.setNotifyPlayer(gameSession.getPlayer1().getName());
-
+							
+							Notification.show("Incorrect Play", Type.ERROR_MESSAGE);
 							applicationEventPublisher.publishEvent(event);
 						}
 					} catch (Exception e) {
@@ -267,11 +279,23 @@ public class GameButtons extends CustomComponent {
 	protected void setPlayer1Name(String name) {
 		this.scoreBoard1.setName(name);
 	}
-
+	
+	protected void setPlayer1Score(int score) {
+		this.scoreBoard1.setScore(score);
+	}
+	
 	public void resetScorePlayer1() {
 		this.scoreBoard1.resetScore();
 	}
-
+	
+	protected int getPlayer1Score() {
+		return this.scoreBoard1.getScore();
+	}
+	
+	protected int getPlayer2Score() {
+		return this.scoreBoard2.getScore();
+	}
+	
 	protected void setPlayer2Name(String name) {
 		this.scoreBoard2.setName(name);
 	}

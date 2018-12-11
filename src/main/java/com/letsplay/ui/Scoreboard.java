@@ -50,4 +50,8 @@ public class Scoreboard extends CustomComponent {
 		this.intScore = 0;
 		this.score.setValue(Integer.toString(this.intScore));
 	}
+	
+	protected int getScore() {
+		return this.intScore;
+	}
 }
