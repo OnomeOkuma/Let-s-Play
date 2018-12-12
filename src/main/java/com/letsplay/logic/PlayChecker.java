@@ -141,18 +141,20 @@ public class PlayChecker implements Serializable {
 				
 				for(int columnCounter = position.getColumn() - 1; boardState.isOccupied(columnCounter, position.getRow()); columnCounter--) {
 					BoardPosition temp = boardState.getOccupiedPosition(columnCounter, position.getRow());
-					score += temp.getTileState().getWeight();
+					score += temp.getTileState().getWeight() * position.getLetterScore();
+					isCrossWordFormed = true;
+				}
+				
+
+				for(int columnCounter = position.getColumn() + 1; boardState.isOccupied(columnCounter, position.getRow()); columnCounter++) {
+					BoardPosition temp = boardState.getOccupiedPosition(columnCounter, position.getRow());
+					score += temp.getTileState().getWeight() * position.getLetterScore();
 					isCrossWordFormed = true;
 				}
 				
 				if(isCrossWordFormed) {
 					score += position.getTileState().getWeight() * position.getLetterScore();
 					wordScoreMultiplier *= position.getWordScore();
-				}
-				
-				for(int columnCounter = position.getColumn() + 1; boardState.isOccupied(columnCounter, position.getRow()); columnCounter++) {
-					BoardPosition temp = boardState.getOccupiedPosition(columnCounter, position.getRow());
-					score += temp.getTileState().getWeight();
 				}
 				
 				isCrossWordFormed = false;
@@ -160,21 +162,22 @@ public class PlayChecker implements Serializable {
 		}else {
 			while(iterator.hasNext()) {
 				BoardPosition position = iterator.next();
-				wordScoreMultiplier *= position.getWordScore();
-				for(int rowCounter = position.getRow() - 1; boardState.isOccupied(rowCounter, position.getRow()); rowCounter--) {
+				
+				for(int rowCounter = position.getRow() - 1; boardState.isOccupied(position.getColumn(), rowCounter); rowCounter--) {
 					BoardPosition temp = boardState.getOccupiedPosition(position.getColumn(), rowCounter);
-					score += temp.getTileState().getWeight();
+					score += temp.getTileState().getWeight() * position.getLetterScore();
+					isCrossWordFormed = true;
+				}
+				
+				for(int rowCounter = position.getRow() + 1; boardState.isOccupied(position.getColumn(), rowCounter); rowCounter++) {
+					BoardPosition temp = boardState.getOccupiedPosition(position.getColumn(), rowCounter);
+					score += temp.getTileState().getWeight() * position.getLetterScore();
 					isCrossWordFormed = true;
 				}
 				
 				if(isCrossWordFormed) {
 					score += position.getTileState().getWeight() * position.getLetterScore();
 					wordScoreMultiplier *= position.getWordScore();
-				}
-				
-				for(int rowCounter = position.getRow() + 1; boardState.isOccupied(rowCounter, position.getRow()); rowCounter++) {
-					BoardPosition temp = boardState.getOccupiedPosition(position.getColumn(), rowCounter);
-					score += temp.getTileState().getWeight();
 				}
 				
 				isCrossWordFormed = false;

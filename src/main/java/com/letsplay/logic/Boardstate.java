@@ -208,6 +208,7 @@ public class Boardstate implements Serializable{
 	
 	public void updateState(List<BoardPosition> postions){
 		
+		this.emptyPositions.removeAll(postions);
 		this.occupiedPositions.addAll(postions);
 
 	}
