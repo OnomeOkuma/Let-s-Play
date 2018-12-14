@@ -22,7 +22,8 @@ public class GameTileBuilder {
 	public GameTile build(){
 		GameTile tile = new GameTile(this.tileState);
 		DragSourceExtension<GameTile> dragSource = new DragSourceExtension<GameTile>(tile);
-		dragSource.setDragData(tile.getData());
+		dragSource.setDragData(tile.getTileState());
+
 		return tile;
 	}
 }

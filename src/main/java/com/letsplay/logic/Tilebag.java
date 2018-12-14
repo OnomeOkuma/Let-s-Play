@@ -78,7 +78,7 @@ public class Tilebag implements Serializable{
 			this.limit = this.limit - 1;
 			return GameTileBuilder.get().setWeight(tileState).build();
 		} else {
-			throw new EmptyTileBagException("Empty Tilebage");
+			throw new EmptyTileBagException("Empty Tilebag");
 		}
 	}
 	
