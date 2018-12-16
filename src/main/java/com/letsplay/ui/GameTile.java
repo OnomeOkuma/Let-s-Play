@@ -24,8 +24,6 @@ public class GameTile extends CustomComponent{
 	
 	public boolean isBlank;
 	
-	private Tilestate previousState;
-	
 	private Tilestate tileState;
 
 
@@ -74,8 +72,6 @@ public class GameTile extends CustomComponent{
 	
 	public void updateBlankImage(String letter) {
 		
-		this.previousState = this.tileState;
-		
 		Tilestate state = new Tilestate(letter.toUpperCase(), 0);
 		this.tileState = state;
 		
@@ -85,30 +81,15 @@ public class GameTile extends CustomComponent{
 		image.setWidth("40px");
 		this.setCompositionRoot(image);
 		Iterator<Extension> iterator = this.getExtensions().iterator();
-
+		
 		while(iterator.hasNext()) {
-			Extension next = iterator.next();
-			if(next instanceof DragSourceExtension)
-				this.getExtensions().remove(next);
+			@SuppressWarnings("unchecked")
+			DragSourceExtension<GameTile> next = (DragSourceExtension<GameTile>) iterator.next();
+			next.setDragData(this.tileState);
 		}
-			
-		DragSourceExtension<GameTile> dragSource = new DragSourceExtension<GameTile>(this);
-		dragSource.setDragData(this.getTileState());
-
+	
 	}
 	
-	public void undoBlankPlay() {
-		
-		this.tileState = this.previousState;
-		String url = this.previousState.getLetter().concat(".jpg");
-		Image image = new Image(null, new ThemeResource(url));
-		image.setHeight("36px");
-		image.setWidth("40px");
-		
-		setCompositionRoot(image);
-	}
-	
-
 	public Tilestate getTileState() {
 		return tileState;
 	}

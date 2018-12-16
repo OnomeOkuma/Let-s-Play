@@ -330,7 +330,7 @@ public class PlayUpdateUI {
 		
 	}
 	
-	@JmsListener(destination = "${application.endgame}")
+	@JmsListener(destination = "${application.finalscore}")
 	public void finalscore(FinalScoreEvent event) {
 		if (sessionList.containsKey(event.getWinner())) {
 			WrappedHttpSession session = sessionList.get(event.getWinner());
