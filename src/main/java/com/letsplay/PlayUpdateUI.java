@@ -325,7 +325,13 @@ public class PlayUpdateUI {
 				}
 				
 			});
+			FinalScoreEvent finalEvent = new FinalScoreEvent("final score");
+			finalEvent.setWinner(event.getWinner());
+			finalEvent.setWinnerScore(winnerScore);
+			finalEvent.setLoser(event.getLoser());
+			finalEvent.setLoserScore(event.getLoserScore());
 			
+			applicationEventPublisher.publishEvent(finalEvent);
 		}
 		
 	}
