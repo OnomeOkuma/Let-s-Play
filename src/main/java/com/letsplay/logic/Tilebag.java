@@ -90,7 +90,7 @@ public class Tilebag implements Serializable{
 		GameTile Tile = null;
 		if(gameTile.isPresent())
 			Tile = (GameTile) gameTile.get();
-		this.stateContainer.add((Tilestate)Tile.getData());
+		this.stateContainer.add(Tile.getTileState());
 		this.limit++;
 	}
 	
