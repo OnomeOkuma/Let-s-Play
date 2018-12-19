@@ -284,6 +284,10 @@ public class GameButtons extends CustomComponent {
 		this.scoreBoard1.setScore(score);
 	}
 	
+	protected void overWritePlayer1Score(int score) {
+		this.scoreBoard1.overWriteScore(score);
+	}
+	
 	public void resetScorePlayer1() {
 		this.scoreBoard1.resetScore();
 	}
@@ -299,7 +303,11 @@ public class GameButtons extends CustomComponent {
 	protected void setPlayer2Name(String name) {
 		this.scoreBoard2.setName(name);
 	}
-
+	
+	protected void overWritePlayer2Score(int score) {
+		this.scoreBoard2.overWriteScore(score);
+	}
+	
 	protected void setPlayer2Score(int score) {
 		this.scoreBoard2.setScore(score);
 	}

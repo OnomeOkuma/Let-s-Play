@@ -20,13 +20,14 @@ public class Tilebag implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -5288053459622593380L;
-	private ArrayList<Tilestate> stateContainer = new ArrayList<Tilestate>(100);
+/*	private ArrayList<Tilestate> stateContainer = new ArrayList<Tilestate>(100);*/
+	private ArrayList<Tilestate> stateContainer = new ArrayList<Tilestate>(23);
 	private Random random;
 	private int limit;
 	
 	public Tilebag() {
 		this.random = new Random();
-		this.limit = 100;
+		/*this.limit = 100;
 		HashMap<Tilestate, Integer> distribution = new HashMap<Tilestate, Integer>(100);
 		distribution.put(new Tilestate("A", Tilestate.A), 9);
 		distribution.put(new Tilestate("B", Tilestate.B), 2);
@@ -55,7 +56,27 @@ public class Tilebag implements Serializable{
 		distribution.put(new Tilestate("Y", Tilestate.Y), 2);
 		distribution.put(new Tilestate("Z", Tilestate.Z), 1);
 		distribution.put(new Tilestate("blank", Tilestate.BLANK), 2);
-		
+		*/
+		this.limit = 23;
+		HashMap<Tilestate, Integer> distribution = new HashMap<Tilestate, Integer>(23);
+		distribution.put(new Tilestate("A", Tilestate.A), 3);
+		distribution.put(new Tilestate("B", Tilestate.B), 2);
+		distribution.put(new Tilestate("C", Tilestate.C), 2);
+		distribution.put(new Tilestate("D", Tilestate.D), 1);
+		distribution.put(new Tilestate("E", Tilestate.E), 2);
+		distribution.put(new Tilestate("F", Tilestate.F), 2);
+		distribution.put(new Tilestate("G", Tilestate.G), 1);
+		distribution.put(new Tilestate("H", Tilestate.H), 1);
+		distribution.put(new Tilestate("I", Tilestate.I), 1);
+		distribution.put(new Tilestate("K", Tilestate.K), 1);
+		distribution.put(new Tilestate("L", Tilestate.L), 1);
+		distribution.put(new Tilestate("M", Tilestate.M), 1);
+		distribution.put(new Tilestate("N", Tilestate.N), 1);
+		distribution.put(new Tilestate("O", Tilestate.O), 1);
+		distribution.put(new Tilestate("P", Tilestate.P), 1);
+		distribution.put(new Tilestate("R", Tilestate.R), 1);
+		distribution.put(new Tilestate("S", Tilestate.S), 1);
+
 		Iterator<Tilestate> keyIterator = distribution.keySet().iterator();
 		
 		while (keyIterator.hasNext()) {

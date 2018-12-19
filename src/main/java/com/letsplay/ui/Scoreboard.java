@@ -41,7 +41,11 @@ public class Scoreboard extends CustomComponent {
 		this.intScore += score;
 		this.score.setValue(Integer.toString(this.intScore));
 	}
-                      
+    
+	protected void overWriteScore(int score) {
+		this.intScore = score;
+		this.score.setValue(Integer.toString(this.intScore));
+	}
 	protected void setName(String name){
         this.name.setValue(name);
     }

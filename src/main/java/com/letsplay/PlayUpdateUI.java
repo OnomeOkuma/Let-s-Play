@@ -299,7 +299,7 @@ public class PlayUpdateUI {
 	@JmsListener(destination = "${application.endgame}")
 	public void endgame(EndgameEvent event) {
 		if (sessionList.containsKey(event.getLoser())) {
-			WrappedHttpSession session = sessionList.get(event.getWinner());
+			WrappedHttpSession session = sessionList.get(event.getLoser());
 			Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
 			VaadinSession vaaSession = vaadinSessions.iterator().next();
 			Collection<UI> uis = vaaSession.getUIs();
@@ -310,7 +310,7 @@ public class PlayUpdateUI {
 			int scoreToAddForWinner = 0;
 			
 			for(GameTile tile : tiles) {
-				Tilestate state = (Tilestate)tile.getData();
+				Tilestate state = tile.getTileState();
 				scoreToAddForWinner += state.getWeight();
 			}
 			
@@ -319,7 +319,7 @@ public class PlayUpdateUI {
 
 				@Override
 				public void run() {
-					gameArea.setPlayer2Score(winnerScore);
+					gameArea.overWritePlayer2Score(winnerScore);
 					Notification.show(event.getWinner() + " is the winner.", Type.ERROR_MESSAGE);
 				
 				}
@@ -345,8 +345,8 @@ public class PlayUpdateUI {
 			Collection<UI> uis = vaaSession.getUIs();
 			UserPage ui = (UserPage) uis.iterator().next();
 			GameArea gameArea = (GameArea)ui.getContent();
-			gameArea.setPlayer1Score(event.getWinnerScore());
-			gameArea.setPlayer2Score(event.getLoserScore());
+			gameArea.overWritePlayer1Score(event.getWinnerScore());
+			gameArea.overWritePlayer2Score(event.getLoserScore());
 			
 			ui.access(new Runnable() {
 
