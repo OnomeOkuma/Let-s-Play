@@ -239,6 +239,7 @@ public class PlayUpdateUI {
 				}
 				
 			});
+			
 		}
 	}	
 	
@@ -274,6 +275,9 @@ public class PlayUpdateUI {
 				
 				e.printStackTrace();
 			}
+			
+			gameSessionService.deleteGameSession(ui.getGameSessionName());
+			
 			
 			
 			ui.access(new Runnable() {
@@ -321,10 +325,30 @@ public class PlayUpdateUI {
 				public void run() {
 					gameArea.overWritePlayer2Score(winnerScore);
 					Notification.show(event.getWinner() + " is the winner.", Type.ERROR_MESSAGE);
-				
+
 				}
 				
 			});
+			
+			try {
+				
+				Player player = playerService.getPlayer(event.getLoser());
+				
+				int losses = player.getLoses();
+				if(losses > 0) {
+					losses--;
+					player.setLoses(losses);
+				}
+				
+				playerService.updatePlayer(player);
+				
+				gameSessionService.deleteGameSession(ui.getGameSessionName());
+				
+			} catch (PlayerNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			FinalScoreEvent finalEvent = new FinalScoreEvent("final score");
 			finalEvent.setWinner(event.getWinner());
 			finalEvent.setWinnerScore(winnerScore);
@@ -356,6 +380,20 @@ public class PlayUpdateUI {
 				}
 				
 			});
+			
+			try {
+				
+				Player player = playerService.getPlayer(event.getWinner());
+				int wins = player.getWins();
+				wins++;
+				player.setWins(wins);
+				playerService.updatePlayer(player);
+				
+			} catch (PlayerNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 	}
 }

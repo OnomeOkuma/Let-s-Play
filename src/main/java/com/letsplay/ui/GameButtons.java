@@ -212,7 +212,8 @@ public class GameButtons extends CustomComponent {
 					
 					event.setLoser(userPage.getCurrentUser());
 					
-					gameSessionService.deleteGameSession(gameSession);
+					gameSessionService.deleteGameSession(gameSession.getName());
+					
 					applicationEventPublisher.publishEvent(event);
 					gameArea.notYourTurn();
 					gameArea.reset();
@@ -249,7 +250,8 @@ public class GameButtons extends CustomComponent {
 					else
 						event.setNotifyPlayer(player1.getName());
 
-					gameSessionService.deleteGameSession(gameSession);
+					gameSessionService.deleteGameSession(gameSession.getName());
+					
 					applicationEventPublisher.publishEvent(event);
 					userPage.setGameSessionName("");
 				} catch (GameSessionNotFoundException e) {

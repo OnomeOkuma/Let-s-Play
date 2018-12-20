@@ -58,9 +58,9 @@ public class GameSessionServiceImpl implements GameSessionService {
 	}
 
 	@Override
-	public void deleteGameSession(GameSession session) {
+	public void deleteGameSession(String name) {
 	
-			gameSessionRepo.delete(session);
+			gameSessionRepo.deleteByName(name);
 			logger.info(".....................Game Session deleted.................");
 		
 	}

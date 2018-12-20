@@ -11,6 +11,6 @@ public interface GameSessionService {
 	
 	public void saveSession(GameSession session);
 	
-	public void deleteGameSession(GameSession session);
+	public void deleteGameSession(String name);
 	
 }
