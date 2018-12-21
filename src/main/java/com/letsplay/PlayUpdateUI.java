@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.dialogs.DefaultConfirmDialogFactory;
 
 import com.letsplay.events.EndgameEvent;
 import com.letsplay.events.FinalScoreEvent;
@@ -33,6 +35,7 @@ import com.letsplay.utils.GameSessionNotFoundException;
 import com.letsplay.utils.PlayerNotFoundException;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedHttpSession;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Notification.Type;
@@ -319,13 +322,38 @@ public class PlayUpdateUI {
 			}
 			
 			int winnerScore = event.getWinnerScore() + (2 * scoreToAddForWinner);
+			gameArea.overWritePlayer2Score(winnerScore);
+			DefaultConfirmDialogFactory df = new DefaultConfirmDialogFactory();
+			ConfirmDialog cd = df.create(null, event.getWinner() + " is the winner.", "Okay", null,
+					null);
+			
+			Button okayButton = cd.getOkButton();
+
+			okayButton.addClickListener(listener -> {
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						GameArea gameArea = (GameArea) ui.getContent();
+						gameArea.reset();
+						gameArea.notYourTurn();
+						gameArea.resetScorePlayer1();
+						gameArea.setPlayer2Name("");
+						gameArea.resetScorePlayer2();
+						ui.setGameSessionName("");
+					}
+					
+				});
+			});
+			
 			ui.access(new Runnable() {
 
 				@Override
 				public void run() {
-					gameArea.overWritePlayer2Score(winnerScore);
-					Notification.show(event.getWinner() + " is the winner.", Type.ERROR_MESSAGE);
-
+					
+					cd.show(ui, listener -> {}, true);
+					ui.push();
+				
 				}
 				
 			});
@@ -372,11 +400,35 @@ public class PlayUpdateUI {
 			gameArea.overWritePlayer1Score(event.getWinnerScore());
 			gameArea.overWritePlayer2Score(event.getLoserScore());
 			
+			DefaultConfirmDialogFactory df = new DefaultConfirmDialogFactory();
+			ConfirmDialog cd = df.create(null, "Congratulations \n you are the winner.", "Okay", null,
+					null);
+			
+			Button okayButton = cd.getOkButton();
+
+			okayButton.addClickListener(listener -> {
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						GameArea gameArea = (GameArea) ui.getContent();
+						gameArea.reset();
+						gameArea.notYourTurn();
+						gameArea.resetScorePlayer1();
+						gameArea.setPlayer2Name("");
+						gameArea.resetScorePlayer2();
+						ui.setGameSessionName("");
+					}
+					
+				});
+			});
+			
 			ui.access(new Runnable() {
 
 				@Override
 				public void run() {
-					Notification.show("Congratulations \n you are the winner.", Type.ERROR_MESSAGE);
+					cd.show(ui, listener -> {}, true);
+					ui.push();
 				}
 				
 			});
