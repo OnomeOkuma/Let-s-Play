@@ -15,9 +15,11 @@ import org.vaadin.dialogs.DefaultConfirmDialogFactory;
 
 import com.letsplay.events.EndgameEvent;
 import com.letsplay.events.FinalScoreEvent;
+import com.letsplay.events.FirstCalculationEvent;
 import com.letsplay.events.LogoutSessionEvent;
 import com.letsplay.events.PlayEvent;
 import com.letsplay.events.ScoreEvent;
+import com.letsplay.events.SecondCalculationEvent;
 import com.letsplay.events.SurrenderEvent;
 import com.letsplay.events.UndoPlayEvent;
 import com.letsplay.logic.BoardPosition;
@@ -324,12 +326,30 @@ public class PlayUpdateUI {
 			int winnerScore = event.getWinnerScore() + (2 * scoreToAddForWinner);
 			gameArea.overWritePlayer2Score(winnerScore);
 			DefaultConfirmDialogFactory df = new DefaultConfirmDialogFactory();
-			ConfirmDialog cd = df.create(null, event.getWinner() + " is the winner.", "Okay", null,
+			ConfirmDialog cd = df.create(null, event.getWinner() + " is the winner.", null, null,
 					null);
-			
+		
 			Button okayButton = cd.getOkButton();
 
 			okayButton.addClickListener(listener -> {
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						GameArea gameArea = (GameArea) ui.getContent();
+						gameArea.reset();
+						gameArea.notYourTurn();
+						gameArea.resetScorePlayer1();
+						gameArea.setPlayer2Name("");
+						gameArea.resetScorePlayer2();
+						ui.setGameSessionName("");
+					}
+					
+				});
+			});
+			
+			Button cancelButton = cd.getCancelButton();
+			cancelButton.addClickListener(listener -> {
 				ui.access(new Runnable() {
 
 					@Override
@@ -401,7 +421,7 @@ public class PlayUpdateUI {
 			gameArea.overWritePlayer2Score(event.getLoserScore());
 			
 			DefaultConfirmDialogFactory df = new DefaultConfirmDialogFactory();
-			ConfirmDialog cd = df.create(null, "Congratulations \n you are the winner.", "Okay", null,
+			ConfirmDialog cd = df.create(null, "Congratulations \n you are the winner.", null, null,
 					null);
 			
 			Button okayButton = cd.getOkButton();
@@ -423,6 +443,23 @@ public class PlayUpdateUI {
 				});
 			});
 			
+			Button cancelButton = cd.getCancelButton();
+			cancelButton.addClickListener(listener -> {
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						GameArea gameArea = (GameArea) ui.getContent();
+						gameArea.reset();
+						gameArea.notYourTurn();
+						gameArea.resetScorePlayer1();
+						gameArea.setPlayer2Name("");
+						gameArea.resetScorePlayer2();
+						ui.setGameSessionName("");
+					}
+					
+				});
+			});
 			ui.access(new Runnable() {
 
 				@Override
@@ -445,6 +482,252 @@ public class PlayUpdateUI {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+		}
+	}
+	
+	
+	@JmsListener(destination = "${application.firstcalculation}")
+	public void firstScoreCalculation(FirstCalculationEvent event) {
+		if (sessionList.containsKey(event.getToPlayer())) {
+			WrappedHttpSession session = sessionList.get(event.getToPlayer());
+			Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
+			VaadinSession vaaSession = vaadinSessions.iterator().next();
+			Collection<UI> uis = vaaSession.getUIs();
+			UserPage ui = (UserPage) uis.iterator().next();
+			GameArea gameArea = (GameArea)ui.getContent();
+			gameArea.overWritePlayer2Score(event.getPlayer1Score());
+			
+			List<GameTile> tiles = gameArea.getTilesRemaining();
+			int scoreToSubtract = 0;
+			
+			for(GameTile tile : tiles) {
+				Tilestate state = tile.getTileState();
+				scoreToSubtract += state.getWeight();
+			}
+			int playerScore = gameArea.getPlayer1Score();
+			playerScore -= scoreToSubtract;
+			gameArea.overWritePlayer1Score(playerScore);
+			DefaultConfirmDialogFactory df = new DefaultConfirmDialogFactory();
+			ConfirmDialog cd = df.create(null, null, null, null,
+					null);
+			
+			Button okayButton = cd.getOkButton();
+
+			okayButton.addClickListener(listener -> {
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						GameArea gameArea = (GameArea) ui.getContent();
+						gameArea.reset();
+						gameArea.notYourTurn();
+						gameArea.resetScorePlayer1();
+						gameArea.setPlayer2Name("");
+						gameArea.resetScorePlayer2();
+						ui.setGameSessionName("");
+					}
+					
+				});
+			});
+			
+			Button cancelButton = cd.getCancelButton();
+			cancelButton.addClickListener(listener -> {
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						GameArea gameArea = (GameArea) ui.getContent();
+						gameArea.reset();
+						gameArea.notYourTurn();
+						gameArea.resetScorePlayer1();
+						gameArea.setPlayer2Name("");
+						gameArea.resetScorePlayer2();
+						ui.setGameSessionName("");
+					}
+					
+				});
+			});
+
+			if (playerScore > event.getPlayer1Score()) {
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						
+						cd.setMessage("Congratulations. \n You are the winner");
+						cd.show(ui, listener -> {}, true);
+						ui.push();
+						
+					}
+					
+				});
+
+				try {
+					
+					Player player = playerService.getPlayer(event.getToPlayer());
+					int wins = player.getWins();
+					wins++;
+					player.setWins(wins);
+					playerService.updatePlayer(player);
+					
+				} catch (PlayerNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
+			}
+			else {
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						
+						cd.setMessage("You lose.");
+						cd.show(ui, listener -> {}, true);
+						ui.push();
+						
+					}
+					
+				});
+				try {
+					
+					Player player = playerService.getPlayer(event.getToPlayer());
+					
+					int losses = player.getLoses();
+					if(losses > 0) {
+						losses--;
+						player.setLoses(losses);
+					}
+					
+					playerService.updatePlayer(player);
+					
+				} catch (PlayerNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			SecondCalculationEvent event2 = new SecondCalculationEvent("second");
+			event2.setToPlayer(event.getFromPlayer());
+			event2.setPlayer2Score(playerScore);
+			applicationEventPublisher.publishEvent(event2);
+		}
+	}
+	
+	@JmsListener(destination = "${application.secondcalculation}")
+	public void secondScoreCalculation(SecondCalculationEvent event) {
+		if (sessionList.containsKey(event.getToPlayer())){
+			WrappedHttpSession session = sessionList.get(event.getToPlayer());
+			Collection<VaadinSession> vaadinSessions = VaadinSession.getAllSessions(session.getHttpSession());
+			VaadinSession vaaSession = vaadinSessions.iterator().next();
+			Collection<UI> uis = vaaSession.getUIs();
+			UserPage ui = (UserPage) uis.iterator().next();
+			GameArea gameArea = (GameArea)ui.getContent();
+			gameArea.overWritePlayer2Score(event.getPlayer2Score());
+			
+			DefaultConfirmDialogFactory df = new DefaultConfirmDialogFactory();
+			ConfirmDialog cd = df.create(null, null, null, null,
+					null);
+			
+			Button okayButton = cd.getOkButton();
+
+			okayButton.addClickListener(listener -> {
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						GameArea gameArea = (GameArea) ui.getContent();
+						gameArea.reset();
+						gameArea.notYourTurn();
+						gameArea.resetScorePlayer1();
+						gameArea.setPlayer2Name("");
+						gameArea.resetScorePlayer2();
+						ui.setGameSessionName("");
+					}
+					
+				});
+			});
+			
+			Button cancelButton = cd.getCancelButton();
+			cancelButton.addClickListener(listener -> {
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						GameArea gameArea = (GameArea) ui.getContent();
+						gameArea.reset();
+						gameArea.notYourTurn();
+						gameArea.resetScorePlayer1();
+						gameArea.setPlayer2Name("");
+						gameArea.resetScorePlayer2();
+						ui.setGameSessionName("");
+					}
+					
+				});
+			});
+			
+			if (gameArea.getPlayer1Score() > event.getPlayer2Score()) {
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						
+						cd.setMessage("Congratulations. \n You are the winner");
+						cd.show(ui, listener -> {}, true);
+						ui.push();
+						
+					}
+					
+				});
+				try {
+					
+					Player player = playerService.getPlayer(event.getToPlayer());
+					int wins = player.getWins();
+					wins++;
+					player.setWins(wins);
+					playerService.updatePlayer(player);
+					
+				} catch (PlayerNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			else {
+				ui.access(new Runnable() {
+
+					@Override
+					public void run() {
+						
+						cd.setMessage("You lose.");
+						cd.show(ui, listener -> {}, true);
+						ui.push();
+						
+					}
+					
+				});
+				
+				try {
+					
+					Player player = playerService.getPlayer(event.getToPlayer());
+					
+					int losses = player.getLoses();
+					if(losses > 0) {
+						losses--;
+						player.setLoses(losses);
+					}
+					
+					playerService.updatePlayer(player);
+					
+				} catch (PlayerNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+				
 			
 		}
 	}

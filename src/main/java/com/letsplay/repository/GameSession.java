@@ -41,7 +41,14 @@ public class GameSession {
 	@Column(length=20000)
 	private Tilebag tileBag;
 	
-	private int endGameTurnsMissed;
+	private int firstPlayerTurnsMissed;
+	
+	private int secondPlayerTurnsMissed;
+	
+	public GameSession() {
+		this.firstPlayerTurnsMissed = 0;
+		this.secondPlayerTurnsMissed = 0;
+	}
 	
 	public ActivePlayer getPlayer1() {
 		return player1;
@@ -99,12 +106,20 @@ public class GameSession {
 		this.tileBag = tileBag;
 	}
 
-	public int getEndGameTurnsMissed() {
-		return endGameTurnsMissed;
+	public int getFirstPlayerTurnsMissed() {
+		return firstPlayerTurnsMissed;
 	}
 
-	public void setEndGameTurnsMissed(int endGameTurnsMissed) {
-		this.endGameTurnsMissed = endGameTurnsMissed;
+	public void setFirstPlayerTurnsMissed(int firstPlayerTurnsMissed) {
+		this.firstPlayerTurnsMissed = firstPlayerTurnsMissed;
 	}
-	
+
+	public int getSecondPlayerTurnsMissed() {
+		return secondPlayerTurnsMissed;
+	}
+
+	public void setSecondPlayerTurnsMissed(int secondPlayerTurnsMissed) {
+		this.secondPlayerTurnsMissed = secondPlayerTurnsMissed;
+	}
+
 }

@@ -130,8 +130,8 @@ public class UpdateUI {
 			Collection<UI> uis = vaaSession.getUIs();
 			UserPage ui = (UserPage) uis.iterator().next();
 			DefaultConfirmDialogFactory df = new DefaultConfirmDialogFactory();
-			ConfirmDialog cd = df.create("Play Invite", event.getFromPlayer() + " wants to play.", "Okay", null,
-					"Not Okay");
+			ConfirmDialog cd = df.create("Play Invite", event.getFromPlayer() + " wants to play.", null, null,
+					null);
 
 			Button okayButton = cd.getOkButton();
 

@@ -1,5 +1,6 @@
 package com.letsplay.ui;
 
+import java.util.List;
 import java.util.Map;
 
 import org.quinto.dawg.CompressedDAWGSet;
@@ -12,11 +13,13 @@ import org.vaadin.teemu.switchui.Switch;
 
 import com.letsplay.UserPage;
 import com.letsplay.events.EndgameEvent;
+import com.letsplay.events.FirstCalculationEvent;
 import com.letsplay.events.LogoutEvent;
 import com.letsplay.events.LogoutSessionEvent;
 import com.letsplay.events.ScoreEvent;
 import com.letsplay.events.SurrenderEvent;
 import com.letsplay.events.UndoPlayEvent;
+import com.letsplay.logic.Tilestate;
 import com.letsplay.repository.ActivePlayer;
 import com.letsplay.repository.GameSession;
 import com.letsplay.service.ActivePlayerService;
@@ -116,10 +119,10 @@ public class GameButtons extends CustomComponent {
 									event.setLoser(gameSession.getPlayer2().getName());
 								else
 									event.setLoser(gameSession.getPlayer1().getName());
-								
+
 								applicationEventPublisher.publishEvent(event);
 							}
-							
+
 						} else {
 
 							UndoPlayEvent event = gameSession.getPlayChecker().undoPlay(gameSession.getBoardState());
@@ -127,7 +130,7 @@ public class GameButtons extends CustomComponent {
 								event.setNotifyPlayer(gameSession.getPlayer2().getName());
 							else
 								event.setNotifyPlayer(gameSession.getPlayer1().getName());
-							
+
 							Notification.show("Incorrect Play", Type.ERROR_MESSAGE);
 							applicationEventPublisher.publishEvent(event);
 						}
@@ -152,10 +155,23 @@ public class GameButtons extends CustomComponent {
 		exchangeTileButton.addClickListener(click -> {
 			UserPage userPage = (UserPage) UI.getCurrent();
 			GameArea gameArea = (GameArea) userPage.getContent();
+
 			if (gameArea.isYourTurn()) {
 
-				TileExchange exchange = new TileExchange();
-				UI.getCurrent().addWindow(exchange);
+				try {
+					GameSession gameSession = gameSessionService.findBySessionName(userPage.getGameSessionName());
+
+					if (!gameSession.getTileBag().isTileBagEmpty()) {
+						TileExchange exchange = new TileExchange();
+						UI.getCurrent().addWindow(exchange);
+					} else {
+						Notification.show("Tile bag is empty", Type.ERROR_MESSAGE);
+					}
+
+				} catch (GameSessionNotFoundException e) {
+
+					e.printStackTrace();
+				}
 
 			} else {
 				Notification.show("It is not your turn", Type.ERROR_MESSAGE);
@@ -171,16 +187,56 @@ public class GameButtons extends CustomComponent {
 			if (gameArea.isYourTurn()) {
 				try {
 					GameSession gameSession = gameSessionService.findBySessionName(userPage.getGameSessionName());
-					ScoreEvent event = new ScoreEvent("Score");
-					if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
-						event.setNotifyPlayer(gameSession.getPlayer2().getName());
-					else
-						event.setNotifyPlayer(gameSession.getPlayer1().getName());
+					
+					if (gameSession.getFirstPlayerTurnsMissed() < 3 
+							|| gameSession.getSecondPlayerTurnsMissed() < 3) {
 
-					event.setScore(0);
-					applicationEventPublisher.publishEvent(event);
-					gameArea.notYourTurn();
+						ScoreEvent event = new ScoreEvent("Score");
+						if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
+							event.setNotifyPlayer(gameSession.getPlayer2().getName());
+						else
+							event.setNotifyPlayer(gameSession.getPlayer1().getName());
 
+						event.setScore(0);
+
+						if (gameSession.getTileBag().isTileBagEmpty()) {
+							if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser())) {
+								int missedTurn1 = gameSession.getFirstPlayerTurnsMissed();
+								gameSession.setFirstPlayerTurnsMissed(missedTurn1 + 1);
+							} else {
+								int missedTurn1 = gameSession.getSecondPlayerTurnsMissed();
+								gameSession.setSecondPlayerTurnsMissed(missedTurn1 + 1);
+							}
+						}
+
+						gameArea.notYourTurn();
+						gameSessionService.saveSession(gameSession);
+						applicationEventPublisher.publishEvent(event);
+					} else {
+						List<GameTile> tiles = gameArea.getTilesRemaining();
+						int scoreToSubtract = 0;
+						
+						for(GameTile tile : tiles) {
+							Tilestate state = tile.getTileState();
+							scoreToSubtract += state.getWeight();
+						}
+						int playerScore = gameArea.getPlayer1Score();
+						playerScore -= scoreToSubtract;
+						gameArea.overWritePlayer1Score(playerScore);
+						
+						FirstCalculationEvent event = new FirstCalculationEvent("firstscore");
+						event.setPlayer1Score(playerScore);
+						
+						if (gameSession.getPlayer1().getName().equals(userPage.getCurrentUser()))
+							event.setToPlayer(gameSession.getPlayer2().getName());
+						else
+							event.setToPlayer(gameSession.getPlayer1().getName());
+						
+						event.setFromPlayer(userPage.getCurrentUser());
+						applicationEventPublisher.publishEvent(event);
+						gameSessionService.deleteGameSession(gameSession.getName());
+						
+					}
 				} catch (GameSessionNotFoundException e) {
 
 					Notification.show("User has not entered into a Gaming Session", Type.ERROR_MESSAGE);
@@ -209,28 +265,28 @@ public class GameButtons extends CustomComponent {
 						event.setWinner(player2.getName());
 					else
 						event.setWinner(player1.getName());
-					
+
 					event.setLoser(userPage.getCurrentUser());
-					
+
 					gameSessionService.deleteGameSession(gameSession.getName());
-					
+
 					applicationEventPublisher.publishEvent(event);
 					gameArea.notYourTurn();
 					gameArea.reset();
 					gameArea.resetScorePlayer1();
 					gameArea.resetScorePlayer2();
 					gameArea.setPlayer2Name("");
-					
+
 					Notification.show("You surrendered thereby forfeiting the game", Type.ERROR_MESSAGE);
 					userPage.setGameSessionName("");
 				} catch (GameSessionNotFoundException e) {
 
 					Notification.show("User has not entered into a Gaming Session", Type.ERROR_MESSAGE);
-					
+
 				}
 			}
 		});
-		
+
 		Button logoutButton = new Button("Log Out");
 		logoutButton.addClickListener(listener -> {
 
@@ -251,13 +307,13 @@ public class GameButtons extends CustomComponent {
 						event.setNotifyPlayer(player1.getName());
 
 					gameSessionService.deleteGameSession(gameSession.getName());
-					
+
 					applicationEventPublisher.publishEvent(event);
 					userPage.setGameSessionName("");
 				} catch (GameSessionNotFoundException e) {
 
 					e.printStackTrace();
-					
+
 				}
 			}
 			vaadinSecurity.logout();
@@ -281,35 +337,35 @@ public class GameButtons extends CustomComponent {
 	protected void setPlayer1Name(String name) {
 		this.scoreBoard1.setName(name);
 	}
-	
+
 	protected void setPlayer1Score(int score) {
 		this.scoreBoard1.setScore(score);
 	}
-	
+
 	protected void overWritePlayer1Score(int score) {
 		this.scoreBoard1.overWriteScore(score);
 	}
-	
+
 	public void resetScorePlayer1() {
 		this.scoreBoard1.resetScore();
 	}
-	
+
 	protected int getPlayer1Score() {
 		return this.scoreBoard1.getScore();
 	}
-	
+
 	protected int getPlayer2Score() {
 		return this.scoreBoard2.getScore();
 	}
-	
+
 	protected void setPlayer2Name(String name) {
 		this.scoreBoard2.setName(name);
 	}
-	
+
 	protected void overWritePlayer2Score(int score) {
 		this.scoreBoard2.overWriteScore(score);
 	}
-	
+
 	protected void setPlayer2Score(int score) {
 		this.scoreBoard2.setScore(score);
 	}

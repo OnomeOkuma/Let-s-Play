@@ -139,6 +139,11 @@ public class GameArea extends CustomComponent{
 	public void setPlayer1Score(int score) {
 		this.buttonArea.setPlayer1Score(score);
 	}
+	
+	public int getPlayer1Score() {
+		return this.buttonArea.getPlayer1Score();
+	}
+	
 	public void overWritePlayer1Score(int score) {
 		this.buttonArea.overWritePlayer1Score(score);
 	}
