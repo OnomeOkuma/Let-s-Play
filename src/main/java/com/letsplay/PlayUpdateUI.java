@@ -268,10 +268,8 @@ public class PlayUpdateUI {
 				player2.setWins(wins);
 				
 				int losses = player1.getLoses();
-				if(losses > 0) {
-					losses--;
-					player1.setLoses(losses);
-				}
+				losses++;
+				player1.setLoses(losses);
 				
 				playerService.updatePlayer(player1);
 				playerService.updatePlayer(player2);
@@ -383,10 +381,8 @@ public class PlayUpdateUI {
 				Player player = playerService.getPlayer(event.getLoser());
 				
 				int losses = player.getLoses();
-				if(losses > 0) {
-					losses--;
-					player.setLoses(losses);
-				}
+				losses++;
+				player.setLoses(losses);
 				
 				playerService.updatePlayer(player);
 				
@@ -596,10 +592,8 @@ public class PlayUpdateUI {
 					Player player = playerService.getPlayer(event.getToPlayer());
 					
 					int losses = player.getLoses();
-					if(losses > 0) {
-						losses--;
-						player.setLoses(losses);
-					}
+					losses++;
+					player.setLoses(losses);
 					
 					playerService.updatePlayer(player);
 					
@@ -714,11 +708,8 @@ public class PlayUpdateUI {
 					Player player = playerService.getPlayer(event.getToPlayer());
 					
 					int losses = player.getLoses();
-					if(losses > 0) {
-						losses--;
-						player.setLoses(losses);
-					}
-					
+					losses++;
+					player.setLoses(losses);
 					playerService.updatePlayer(player);
 					
 				} catch (PlayerNotFoundException e) {
