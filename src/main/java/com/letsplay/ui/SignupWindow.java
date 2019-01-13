@@ -4,9 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.letsplay.repository.Player;
 import com.letsplay.service.StaticSignupServiceUsage;
+import com.letsplay.utils.ConfirmPasswordValidator;
+import com.letsplay.utils.UsernameValidator;
 import com.vaadin.addon.locale.LocaleComboBox;
+import com.vaadin.data.Binder;
+import com.vaadin.data.ValidationException;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.VaadinSessionScope;
@@ -29,14 +35,21 @@ public class SignupWindow extends Window {
 	 */
 	private static final long serialVersionUID = 2455092946066475537L;
 	
-	public SignupWindow() {
+	@Autowired
+	public SignupWindow(UsernameValidator usernameValidator, ConfirmPasswordValidator confirmPasswordValidator) {
 		
 		FormLayout form = new FormLayout();
 		form.setMargin(true);
+		Player player = new Player();
+		Binder<Player> usernameBinder = new Binder<Player>();
+		Binder<Player> confirm = new Binder<Player>();
 		
 		TextField userName = new TextField("Username");
 		userName.setRequiredIndicatorVisible(true);
 		userName.setIcon(VaadinIcons.MAILBOX);
+		usernameBinder.forField(userName)
+						.withValidator(usernameValidator)
+						.bind(Player:: getUserName, Player:: setUserName);
 		
 		PasswordField password = new PasswordField("Password");
 		password.setRequiredIndicatorVisible(true);
@@ -45,6 +58,9 @@ public class SignupWindow extends Window {
 		PasswordField confirmPassword = new PasswordField("Confirm Password");
 		confirmPassword.setRequiredIndicatorVisible(true);
 		confirmPassword.setIcon(VaadinIcons.PASSWORD);
+		confirm.forField(confirmPassword)
+				.withValidator(confirmPasswordValidator)
+				.bind(Player::getPassword, Player::setPassword);
 		
 		LocaleComboBox country = new LocaleComboBox();
 		Locale[] temp = Locale.getAvailableLocales();
@@ -61,18 +77,24 @@ public class SignupWindow extends Window {
 		Button signUp = new Button("Sign Up");
 		signUp.addClickListener(click -> {
 			
-			Player player = new Player();
-			player.setUserName(userName.getValue());
-			player.setPassword(password.getValue());
-			Locale locale = country.getValue();
 			
-			player.setCountry(locale.getCountry());
+			try {
+				usernameBinder.writeBean(player);
+				confirm.writeBean(player);
+				
+				Locale locale = country.getValue();
+				
+				player.setCountry(locale.getCountry());
+				
+				StaticSignupServiceUsage.registerUser(player);
+				
+				Notification.show("User registered",Type.HUMANIZED_MESSAGE);
+				
+				this.close();
+			} catch (ValidationException e) {
+				Notification.show(e.getMessage(), Type.ERROR_MESSAGE);
+			}
 			
-			StaticSignupServiceUsage.registerUser(player);
-			
-			Notification.show("User registered",Type.HUMANIZED_MESSAGE);
-			
-			this.close();
 		});
 		
 		signUp.setStyleName(ValoTheme.BUTTON_PRIMARY);
