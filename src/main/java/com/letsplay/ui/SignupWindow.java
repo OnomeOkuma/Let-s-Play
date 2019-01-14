@@ -54,6 +54,9 @@ public class SignupWindow extends Window {
 		PasswordField password = new PasswordField("Password");
 		password.setRequiredIndicatorVisible(true);
 		password.setIcon(VaadinIcons.PASSWORD);
+		password.addValueChangeListener(listener -> {
+			confirmPasswordValidator.setPasswordToCheckAgainst(password.getValue());
+		});
 		
 		PasswordField confirmPassword = new PasswordField("Confirm Password");
 		confirmPassword.setRequiredIndicatorVisible(true);
@@ -81,7 +84,6 @@ public class SignupWindow extends Window {
 			try {
 				usernameBinder.writeBean(player);
 				confirm.writeBean(player);
-				
 				Locale locale = country.getValue();
 				
 				player.setCountry(locale.getCountry());

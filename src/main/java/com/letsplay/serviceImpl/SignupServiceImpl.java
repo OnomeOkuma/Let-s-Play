@@ -36,9 +36,9 @@ public class SignupServiceImpl implements SignupService, Serializable{
 
 	@Override
 	public void registerUser(Player player) {
+		player.setUserName(player.getUserName().toLowerCase());
 		player.setPassword(passwordEncoder.encode(player.getPassword()));
 		playerRepository.save(player);
-
 	}
 
 	@Override
