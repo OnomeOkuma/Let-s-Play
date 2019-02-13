@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.letsplay</groupId>
-	<artifactId>ProblematicScrabbleGame</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>Scrabble</artifactId>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 
-	<name>ProblematicScrabbleGame</name>
+	<name>Scrabble</name>
 	<description>A Scrabble web-based game</description>
 
 	<parent>
@@ -72,12 +72,15 @@
 			<artifactId>vaadin-spring-boot-starter</artifactId>
 		</dependency>
 
-		<!-- <dependency> <groupId>org.postgresql</groupId> <artifactId>postgresql</artifactId> 
-			<scope>runtime</scope> </dependency> -->
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
 		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>com.h2database</groupId> -->
+		<!-- <artifactId>h2</artifactId> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>de.steinwedel.vaadin.addon</groupId>
@@ -151,7 +154,7 @@
 					<style>OBF</style>
 					<strict>true</strict>
 				</configuration>
-				<executions>
+<!-- 				<executions>
 					<execution>
 						<goals>
 							<goal>update-theme</goal>
@@ -160,7 +163,7 @@
 							<goal>compile-theme</goal>
 						</goals>
 					</execution>
-				</executions>
+				</executions> -->
 			</plugin>
 
 
