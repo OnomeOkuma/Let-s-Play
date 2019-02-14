@@ -87,7 +87,14 @@
 			<artifactId>messagebox</artifactId>
 			<version>4.0.21</version>
 		</dependency>
-
+		
+		<!-- https://mvnrepository.com/artifact/com.vaadin/vaadin-sass-compiler -->
+<dependency>
+    <groupId>com.vaadin</groupId>
+    <artifactId>vaadin-sass-compiler</artifactId>
+    <version>0.9.13</version>
+</dependency>
+		
 		<dependency>
 			<groupId>com.vaadin.addon</groupId>
 			<artifactId>locale</artifactId>
@@ -154,7 +161,7 @@
 					<style>OBF</style>
 					<strict>true</strict>
 				</configuration>
-<!-- 				<executions>
+				<executions>
 					<execution>
 						<goals>
 							<goal>update-theme</goal>
@@ -163,7 +170,7 @@
 							<goal>compile-theme</goal>
 						</goals>
 					</execution>
-				</executions> -->
+				</executions>
 			</plugin>
 
 
